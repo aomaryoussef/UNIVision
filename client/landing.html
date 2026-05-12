@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNIVision — Effortless Academic Reporting</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:   #C9A84C;
+      --gold2:  #e8c96a;
+      --navy:   #07091A;
+      --navy2:  #0d1128;
+      --navy3:  #111a35;
+      --glass:  rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.08);
+      --text:   #e8eaf0;
+      --muted:  rgba(200,205,220,0.55);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: "Inter", sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── Background ─────────────────────────────────────── */
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background: linear-gradient(135deg, #0e1535 0%, #152045 40%, #0f1a3a 100%);
+    }
+
+    /* Glow orbs */
+    .bg::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 72% 38%, rgba(60,110,255,0.45) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 50% at 15% 65%, rgba(30,70,200,0.3) 0%, transparent 55%),
+        radial-gradient(ellipse 35% 30% at 80% 80%, rgba(201,168,76,0.14) 0%, transparent 55%),
+        radial-gradient(ellipse 25% 20% at 10% 15%, rgba(201,168,76,0.1) 0%, transparent 50%);
+      animation: breathe 8s ease-in-out infinite alternate;
+    }
+
+    /* Grid overlay */
+    .bg::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 20%, transparent 75%);
+    }
+
+    /* Floating glow blobs */
+    .glow-blob {
+      position: fixed; border-radius: 50%;
+      filter: blur(80px); pointer-events: none; z-index: 0;
+      animation: float 10s ease-in-out infinite alternate;
+    }
+    .glow-blob.b1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(60,110,255,0.3) 0%, transparent 70%);
+      top: -150px; right: 0%;
+      animation-duration: 12s;
+    }
+    .glow-blob.b2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(201,168,76,0.18) 0%, transparent 70%);
+      bottom: 5%; left: 5%;
+      animation-duration: 9s; animation-delay: -4s;
+    }
+    .glow-blob.b3 {
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(120,80,255,0.2) 0%, transparent 70%);
+      top: 40%; right: 20%;
+      animation-duration: 14s; animation-delay: -7s;
+    }
+
+    @keyframes breathe {
+      from { opacity: 0.8; }
+      to   { opacity: 1; }
+    }
+    @keyframes float {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, -30px) scale(1.08); }
+    }
+
+    /* ── Nav ────────────────────────────────────────────── */
+    nav {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 60px;
+    }
+    .logo-mark { display: flex; flex-direction: column; }
+    .logo-mark .wordmark {
+      font-size: 1.45rem; font-weight: 800; letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .logo-mark .wordmark span { color: var(--gold); }
+    .logo-mark .sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-size: 0.88rem; color: var(--muted); text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      font-size: 0.85rem; font-weight: 600; padding: 9px 22px;
+      border: 1px solid rgba(201,168,76,0.35); border-radius: 99px;
+      color: var(--gold); background: rgba(201,168,76,0.06);
+      text-decoration: none; transition: all .2s;
+    }
+    .nav-cta:hover { background: rgba(201,168,76,0.14); border-color: var(--gold); }
+
+    /* ── Hero ───────────────────────────────────────────── */
+    .hero {
+      position: relative; z-index: 5;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 60px;
+      padding: 60px 60px 0;
+      min-height: calc(100vh - 88px - 260px);
+    }
+
+    .hero-left { display: flex; flex-direction: column; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--gold);
+      background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.2);
+      padding: 6px 14px; border-radius: 99px; margin-bottom: 28px;
+      width: fit-content;
+    }
+    .hero-badge i { font-size: 0.7rem; }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 4vw, 3.5rem);
+      font-weight: 300; line-height: 1.15; letter-spacing: -1px;
+      margin-bottom: 24px;
+    }
+    .hero-title strong { font-weight: 800; color: var(--gold); }
+
+    .hero-desc {
+      font-size: 1rem; color: var(--muted); line-height: 1.7;
+      max-width: 420px; margin-bottom: 40px;
+    }
+
+    .hero-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+
+    .btn-get-started {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 1rem; font-weight: 700; padding: 14px 34px;
+      border-radius: 99px;
+      background: linear-gradient(135deg, #C9A84C 0%, #e8c96a 50%, #C9A84C 100%);
+      background-size: 200% auto;
+      color: #07091A; text-decoration: none;
+      box-shadow: 0 4px 24px rgba(201,168,76,0.35);
+      transition: all .3s;
+    }
+    .btn-get-started:hover {
+      background-position: right center;
+      box-shadow: 0 6px 32px rgba(201,168,76,0.5);
+      transform: translateY(-1px);
+    }
+
+    .hero-note {
+      font-size: 0.8rem; color: var(--muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .hero-note i { color: var(--gold); font-size: 0.7rem; }
+
+    /* ── Dashboard Mockup ───────────────────────────────── */
+    .hero-right { display: flex; align-items: center; justify-content: center; }
+
+    .device-frame {
+      position: relative;
+      width: 100%; max-width: 520px;
+      background: #10152a;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      box-shadow:
+        0 0 0 1px rgba(201,168,76,0.08),
+        0 40px 80px rgba(0,0,0,0.6),
+        0 0 60px rgba(30,60,180,0.12);
+      overflow: hidden;
+    }
+
+    .device-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 16px; background: #0d1125;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .device-bar .dot { width:9px;height:9px;border-radius:50%; }
+    .device-bar .dot:nth-child(1){background:#ff5f57;}
+    .device-bar .dot:nth-child(2){background:#febc2e;}
+    .device-bar .dot:nth-child(3){background:#28c840;}
+    .device-bar .url {
+      flex:1; margin: 0 12px; height:20px;
+      background: rgba(255,255,255,0.05); border-radius:4px;
+      font-size:.65rem; color:var(--muted); display:flex;align-items:center;padding:0 8px;
+    }
+
+    .device-content { padding: 18px; }
+
+    .mock-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+    }
+    .mock-header .m-title { font-size:.8rem; font-weight:700; color:var(--text); }
+    .mock-header .m-badge {
+      font-size:.65rem; padding:3px 8px; border-radius:99px;
+      background:rgba(201,168,76,.12); color:var(--gold); font-weight:600;
+    }
+
+    .mock-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+    .mock-stat {
+      background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
+      border-radius:8px; padding:10px;
+    }
+    .mock-stat .sv { font-size:.9rem; font-weight:800; color:var(--gold); }
+    .mock-stat .sl { font-size:.6rem; color:var(--muted); margin-top:2px; }
+
+    .mock-chart { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:12px; margin-bottom:12px; }
+    .mock-chart-label { font-size:.65rem; color:var(--muted); margin-bottom:10px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; }
+    .bars { display:flex; align-items:flex-end; gap:6px; height:60px; }
+    .bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .bar {
+      width:100%; border-radius:3px 3px 0 0;
+      background:linear-gradient(180deg, rgba(201,168,76,.9) 0%, rgba(201,168,76,.4) 100%);
+    }
+    .bar-lbl { font-size:.5rem; color:var(--muted); }
+
+    .mock-line-chart { position:relative; height:50px; margin-bottom:12px; }
+    .mock-line-chart svg { width:100%; height:100%; }
+
+    .mock-rows { display:flex; flex-direction:column; gap:6px; }
+    .mock-row {
+      display:flex; align-items:center; gap:8px;
+      background:rgba(255,255,255,.03); border-radius:6px; padding:7px 10px;
+    }
+    .mock-row-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+    .mock-row-name { font-size:.65rem; color:var(--text); flex:1; }
+    .mock-row-val  { font-size:.65rem; font-weight:700; }
+    .mock-progress { flex:1; height:4px; background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden; }
+    .mock-progress-fill { height:100%; border-radius:99px; }
+
+    /* ── Features ───────────────────────────────────────── */
+    .features {
+      position: relative; z-index: 5;
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 16px; padding: 60px 60px 0;
+    }
+
+    .feature-card {
+      display: flex; align-items: flex-start; gap: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px; padding: 24px 22px;
+      backdrop-filter: blur(12px);
+      transition: all .25s;
+    }
+    .feature-card:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(201,168,76,0.2);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 44px; height: 44px; flex-shrink: 0;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.18);
+      font-size: 1.1rem; color: var(--gold);
+    }
+    .feature-text h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+    .feature-text p  { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    footer {
+      position: relative; z-index: 5;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 32px 60px 28px; flex-wrap: wrap; gap: 12px;
+      border-top: 1px solid rgba(255,255,255,0.06); margin-top: 60px;
+    }
+    footer .f-links { display: flex; gap: 24px; list-style: none; }
+    footer .f-links a { font-size: 0.78rem; color: var(--muted); text-decoration: none; transition: color .2s; }
+    footer .f-links a:hover { color: var(--text); }
+    footer .f-copy { font-size: 0.75rem; color: rgba(200,205,220,0.3); }
+    .social-links { display: flex; gap: 12px; }
+    .social-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted); transition: all .2s;
+    }
+    .social-btn:hover { background: rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.3); color: var(--gold); transform: translateY(-2px); }
+    .social-btn.fb:hover  { background: rgba(24,119,242,0.12); border-color: rgba(24,119,242,0.35); color: #4e9af1; }
+    .social-btn.ig:hover  { background: rgba(225,48,108,0.12); border-color: rgba(225,48,108,0.35); color: #e1306c; }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 20px 28px; }
+      nav .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 40px 28px 0; gap: 40px; }
+      .hero-right { display: none; }
+      .features { grid-template-columns: 1fr; padding: 40px 28px 0; }
+      footer { padding: 24px 28px; }
+    }
+  </style>
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+
+  <div class="bg"></div>
+  <div class="glow-blob b1"></div>
+  <div class="glow-blob b2"></div>
+  <div class="glow-blob b3"></div>
+
+  <!-- ── Nav ──────────────────────────────────────────────── -->
+  <nav>
+    <div class="logo-mark"><img src="/assets/logo.png" alt="UniVision" style="height:44px;width:auto;"></div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="/login" class="nav-cta">Sign In</a>
+  </nav>
+
+  <!-- ── Hero ─────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <i class="fas fa-graduation-cap"></i>
+        Academic Excellence Platform
+      </div>
+      <h1 class="hero-title">
+        Effortless<br>
+        <strong>Academic</strong><br>
+        Reporting
+      </h1>
+      <p class="hero-desc">
+        A unified portal for students, doctors, and administrators to track grades,
+        attendance, and academic progress — all in one place.
+      </p>
+      <div class="hero-actions">
+        <a href="/login" class="btn-get-started">
+          Get Started <i class="fas fa-arrow-right"></i>
+        </a>
+        <span class="hero-note">
+          <i class="fas fa-lock"></i> Secure university login
+        </span>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="device-frame">
+        <div class="device-bar">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <div class="url">univision.eelu.edu.eg</div>
+        </div>
+        <div class="device-content">
+          <div class="mock-header">
+            <div class="m-title">Student Dashboard</div>
+            <div class="m-badge">Spring 2024</div>
+          </div>
+          <div class="mock-stats">
+            <div class="mock-stat"><div class="sv">3.75</div><div class="sl">GPA</div></div>
+            <div class="mock-stat"><div class="sv">92%</div><div class="sl">Attendance</div></div>
+            <div class="mock-stat"><div class="sv">18</div><div class="sl">Credits</div></div>
+          </div>
+          <div class="mock-chart">
+            <div class="mock-chart-label">GPA History</div>
+            <div class="bars">
+              <div class="bar-wrap"><div class="bar" style="height:60%;"></div><div class="bar-lbl">S1</div></div>
+              <div class="bar-wrap"><div class="bar" style="height:72%;"></div><div class="bar-lbl">S2</div></div>
+              <div class="bar-wrap"><div class="bar" style="height:80%;"></div><div class="bar-lbl">S3</div></div>
+              <div class="bar-wrap"><div class="bar" style="height:94%;background:linear-gradient(180deg,#e8c96a,#C9A84C);"></div><div class="bar-lbl">S4</div></div>
+            </div>
+          </div>
+          <div class="mock-rows">
+            <div class="mock-row">
+              <div class="mock-row-dot" style="background:#4ade80;"></div>
+              <div class="mock-row-name">Computer Networks</div>
+              <div class="mock-progress"><div class="mock-progress-fill" style="width:95%;background:#4ade80;"></div></div>
+              <div class="mock-row-val" style="color:#4ade80;">A</div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-row-dot" style="background:#C9A84C;"></div>
+              <div class="mock-row-name">Operating Systems</div>
+              <div class="mock-progress"><div class="mock-progress-fill" style="width:78%;background:#C9A84C;"></div></div>
+              <div class="mock-row-val" style="color:#C9A84C;">B+</div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-row-dot" style="background:#4ade80;"></div>
+              <div class="mock-row-name">Artificial Intelligence</div>
+              <div class="mock-progress"><div class="mock-progress-fill" style="width:92%;background:#4ade80;"></div></div>
+              <div class="mock-row-val" style="color:#4ade80;">A-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Features ─────────────────────────────────────────── -->
+  <section class="features" id="features">
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+      <div class="feature-text">
+        <h3>Instant Reports</h3>
+        <p>Generate detailed student academic reports in real time — no manual work, no delays.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-users"></i></div>
+      <div class="feature-text">
+        <h3>Doctor & Admin Tools</h3>
+        <p>Manage grades, attendance, and feedback from a single intuitive dashboard.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+      <div class="feature-text">
+        <h3>Enterprise Grade Security</h3>
+        <p>JWT-based authentication and role-based access control keep your data safe.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ───────────────────────────────────────────── -->
+  <footer id="contact">
+    <ul class="f-links">
+      <li><a href="#">Privacy Policy</a></li>
+      <li><a href="#">Terms of Service</a></li>
+      <li><a href="#">Support</a></li>
+    </ul>
+    <div class="social-links">
+      <a class="social-btn fb" href="https://www.facebook.com/share/1Hu8kg7tb1/?mibextid=wwXIfr" target="_blank" rel="noopener" title="Facebook">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+      <a class="social-btn ig" href="https://www.instagram.com/uni.vision.1?igsh=MWE2YXpuNmdrbHNsZQ==" target="_blank" rel="noopener" title="Instagram">
+        <i class="fab fa-instagram"></i>
+      </a>
+    </div>
+    <div class="f-copy">© 2024 UNIVision. All rights reserved.</div>
+  </footer>
+
+  <script type="module">
+    import { Auth } from "/js/student-api.js";
+    const { id, role } = Auth.getSession();
+    if (id) {
+      window.location.href = (role === "doctor" || role === "admin") ? "/doctor.html" : "/home.html";
+    }
+  </script>
+</body>
+</html>

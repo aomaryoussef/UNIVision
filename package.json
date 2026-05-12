@@ -1,0 +1,23 @@
+{
+  "name": "univision",
+  "version": "1.0.0",
+  "description": "UniVision — University Student Portal System",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node server/app.js",
+    "dev": "node --watch server/app.js",
+    "db:clean": "node server/scripts/clean.js",
+    "db:seed:doctor": "node server/scripts/seed-doctor.js",
+    "db:seed:students": "node server/scripts/seed-students.js",
+    "db:seed:schedule": "node server/scripts/seed-schedule.js",
+    "db:seed:staff": "node server/scripts/seed-staff.js",
+    "db:seed:all": "node server/scripts/seed-doctor.js && node server/scripts/seed-students.js && node server/scripts/seed-schedule.js && node server/scripts/seed-staff.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

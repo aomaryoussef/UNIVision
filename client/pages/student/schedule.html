@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Univision — Schedule</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .page-wrap { padding: 32px; max-width: 1100px; margin: 0 auto; margin-top: var(--nav-h); }
+
+    .page-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+    .page-sub   { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 28px; }
+
+    /* Day sections */
+    .day-section { margin-bottom: 28px; }
+    .day-label {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .day-label::after {
+      content: ""; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .slots { display: grid; gap: 10px; }
+
+    .slot-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius-sm); padding: 14px 18px;
+      display: grid; grid-template-columns: 90px 1fr auto;
+      align-items: center; gap: 16px;
+    }
+    .slot-card.lab      { border-left-color: var(--success); }
+    .slot-card.tutorial { border-left-color: #f59e0b; }
+
+    .slot-time {
+      font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);
+      display: flex; flex-direction: column; gap: 2px; text-align: center;
+    }
+    .slot-time .t-start { font-size: 1rem; color: var(--text-primary); }
+
+    .slot-info .s-course { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
+    .slot-info .s-meta   { font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 14px; flex-wrap: wrap; }
+    .slot-info .s-meta span { display: flex; align-items: center; gap: 5px; }
+
+    .type-badge {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 99px; letter-spacing: .5px;
+    }
+    .type-badge.Lecture  { background: rgba(var(--accent-rgb),.12); color: var(--accent); }
+    .type-badge.Lab      { background: rgba(74,222,128,.12);  color: var(--success); }
+    .type-badge.Tutorial { background: rgba(245,158,11,.12);  color: #f59e0b; }
+
+    .empty-day {
+      color: var(--text-muted); font-size: 0.82rem;
+      padding: 12px 0; font-style: italic;
+    }
+
+    .empty-state {
+      text-align: center; color: var(--text-muted);
+      padding: 60px 20px; font-size: 0.9rem;
+    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 14px; display: block; opacity: .3; }
+
+    @media (max-width: 600px) {
+      .slot-card { grid-template-columns: 1fr; gap: 8px; }
+    }
+  </style>
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="/assets/logo.png" alt="UniVision" style="height:52px;width:auto;">
+      </div>
+      <div class="nav-user">
+        <span>Student</span>
+        <strong id="navName">—</strong>
+      </div>
+    </div>
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="home.html"><i class="fas fa-th-large"></i><span>Home</span></a></li>
+      <li class="nav-item"><a href="grades.html"><i class="fas fa-star"></i><span>Grades</span></a></li>
+      <li class="nav-item"><a href="attendance.html"><i class="fas fa-calendar-check"></i><span>Attendance</span></a></li>
+      <li class="nav-item"><a href="comparison.html"><i class="fas fa-balance-scale"></i><span>Performance</span></a></li>
+      <li class="nav-item"><a href="reports.html"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li>
+      <li class="nav-item active"><a href="schedule.html"><i class="fas fa-clock"></i><span>Schedule</span></a></li>
+      <li class="nav-item"><a href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a></li>
+    </ul>
+    <button id="logoutBtn" style="
+      display:flex;align-items:center;gap:7px;padding:8px 14px;
+      border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;
+      color:var(--danger);border:1px solid rgba(239,68,68,.25);
+      background:rgba(239,68,68,.06);cursor:pointer;transition:all .2s;">
+      <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+    </button>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="page-title">Weekly Schedule</div>
+    <div class="page-sub" id="scheduleSub">Your lecture timetable for the current semester</div>
+    <div id="scheduleRoot">
+      <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading…</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { Auth, StudentAPI } from "/js/student-api.js";
+
+    const { id, role, name } = Auth.getSession();
+    if (!id || role === "doctor" || role === "admin") {
+      window.location.href = (role === "doctor" || role === "admin") ? "doctor.html" : "/";
+    }
+
+    document.getElementById("navName").textContent = name || "—";
+    document.getElementById("logoutBtn").addEventListener("click", () => Auth.logout());
+
+    const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"];
+
+    try {
+      // Fetch profile to display semester info
+      const profile = await StudentAPI.profile(id);
+      const grade = profile?.grade || 1;
+      document.getElementById("scheduleSub").textContent = `Your lecture timetable — Grade ${grade}`;
+
+      const rows = await StudentAPI.schedule(id);
+      const root = document.getElementById("scheduleRoot");
+
+      if (!rows.length) {
+        root.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i>No schedule entries yet.</div>`;
+      } else {
+        const byDay = {};
+        DAYS.forEach(d => byDay[d] = []);
+        rows.forEach(r => { if (byDay[r.day]) byDay[r.day].push(r); });
+
+        const fmt = t => {
+          const [h, m] = t.split(":");
+          const hr = +h; const ampm = hr >= 12 ? "PM" : "AM";
+          return `${hr % 12 || 12}:${m} ${ampm}`;
+        };
+
+        root.innerHTML = DAYS.map(day => {
+          const slots = byDay[day];
+          const slotsHtml = slots.length
+            ? slots.map(r => `
+                <div class="slot-card ${r.type.toLowerCase()}">
+                  <div class="slot-time">
+                    <span class="t-start">${fmt(r.start_time)}</span>
+                    <span style="color:var(--text-muted);">–</span>
+                    <span>${fmt(r.end_time)}</span>
+                  </div>
+                  <div class="slot-info">
+                    <div class="s-course">${r.course_name}</div>
+                    <div class="s-meta">
+                      ${r.location ? `<span><i class="fas fa-map-marker-alt"></i>${r.location}</span>` : ""}
+                      ${r.doctor_name ? `<span><i class="fas fa-user-tie"></i>${r.doctor_name}</span>` : ""}
+                    </div>
+                  </div>
+                  <span class="type-badge ${r.type}">${r.type}</span>
+                </div>
+              `).join("")
+            : `<div class="empty-day">No classes</div>`;
+
+          return `
+            <div class="day-section">
+              <div class="day-label">${day}</div>
+              <div class="slots">${slotsHtml}</div>
+            </div>
+          `;
+        }).join("");
+      }
+    } catch(err) {
+      console.error(err);
+      document.getElementById("scheduleRoot").innerHTML =
+        `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i>Failed to load schedule.</div>`;
+    }
+  </script>
+</body>
+</html>

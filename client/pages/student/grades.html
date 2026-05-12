@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Univision — Grades</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .page-wrap { padding: 32px; max-width: 1100px; margin: 0 auto; margin-top: var(--nav-h); }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-size: 1.5rem; font-weight: 800; }
+    .page-header p  { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+
+    .gpa-banner {
+      display: flex; align-items: center; gap: 20px; padding: 20px 24px;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+      margin-bottom: 24px;
+    }
+    .gpa-banner .val { font-size: 2rem; font-weight: 800; color: var(--accent); }
+    .gpa-banner .lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+
+    .subject-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px; margin-bottom: 16px;
+    }
+    .subject-card.danger { border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.03); }
+    .subject-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    .subject-name { font-size: 1rem; font-weight: 700; }
+    .grade-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: var(--radius-sm);
+      font-size: 1rem; font-weight: 800;
+      background: rgba(var(--accent-rgb),.12); color: var(--accent); border: 1px solid rgba(var(--accent-rgb),.2);
+    }
+    .grade-badge.danger { background: rgba(239,68,68,.12); color: var(--danger); border-color: rgba(239,68,68,.25); }
+
+    .breakdown { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .breakdown-item {
+      background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 12px;
+    }
+    .breakdown-item .b-lbl { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+    .breakdown-item .b-val { font-size: 0.95rem; font-weight: 700; }
+
+    .progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .progress-row .p-lbl { font-size: 0.8rem; color: var(--text-muted); width: 90px; }
+    .progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+    .progress-fill.danger { background: var(--danger); }
+    .progress-row .p-num { font-size: 0.8rem; font-weight: 600; width: 60px; text-align: right; }
+
+    .next-target {
+      display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem;
+      padding: 6px 12px; border-radius: var(--radius-sm);
+      background: rgba(var(--accent-rgb),.06); border: 1px solid rgba(var(--accent-rgb),.15); color: var(--accent);
+    }
+    .next-target.danger { background: rgba(239,68,68,.06); border-color: rgba(239,68,68,.2); color: var(--danger); }
+
+    /* Contact details */
+    .contact-bar {
+      display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px;
+      padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    .contact-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      font-size: 0.8rem; flex: 1; min-width: 220px;
+    }
+    .contact-item i {
+      font-size: 1rem; width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .contact-item .c-role { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+    .contact-item .c-name { font-weight: 600; font-size: 0.82rem; }
+    .contact-item .c-email { font-size: 0.75rem; color: var(--info); }
+    .contact-item .c-email a { color: var(--info); text-decoration: none; }
+    .contact-item .c-email a:hover { text-decoration: underline; }
+    .contact-item.doctor i { background: rgba(var(--accent-rgb),.12); color: var(--accent); }
+    .contact-item.assistant i { background: rgba(94,234,212,.12); color: var(--success); }
+
+    .feedback-section { margin-top: 32px; }
+    .feedback-section h2 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
+    .feedback-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 18px 22px; margin-bottom: 12px; border-left: 3px solid var(--border);
+    }
+    .feedback-card.danger { border-left-color: var(--danger); }
+    .feedback-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; }
+    .feedback-meta strong { color: var(--text-secondary); }
+    .feedback-body { font-size: 0.88rem; line-height: 1.6; }
+
+    .empty { color: var(--text-muted); font-size: 0.88rem; padding: 30px 0; text-align: center; }
+  </style>
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="/assets/logo.png" alt="UniVision" style="height:52px;width:auto;">
+      </div>
+      <div class="nav-user"><span>Student</span><strong id="navName">—</strong></div>
+    </div>
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="home.html"><i class="fas fa-th-large"></i><span>Home</span></a></li>
+      <li class="nav-item active"><a href="grades.html"><i class="fas fa-star"></i><span>Grades</span></a></li>
+      <li class="nav-item"><a href="attendance.html"><i class="fas fa-calendar-check"></i><span>Attendance</span></a></li>
+      <li class="nav-item"><a href="comparison.html"><i class="fas fa-balance-scale"></i><span>Performance</span></a></li>
+      <li class="nav-item"><a href="reports.html"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li>
+      <li class="nav-item"><a href="schedule.html"><i class="fas fa-clock"></i><span>Schedule</span></a></li>
+      <li class="nav-item"><a href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a></li>
+    </ul>
+    <button id="logoutBtn" style="display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;color:var(--danger);border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);cursor:pointer;transition:all .2s;">
+      <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+    </button>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>Grades</h1>
+      <p>Current semester performance and feedback</p>
+    </div>
+
+    <div class="gpa-banner">
+      <div>
+        <div class="val" id="currentGPA">—</div>
+        <div class="lbl">Current GPA</div>
+      </div>
+    </div>
+
+    <div id="subjectList"><div class="empty"><i class="fas fa-spinner fa-spin"></i> Loading…</div></div>
+
+    <div class="feedback-section">
+      <h2>Doctor Feedback</h2>
+      <div id="feedbackList"><div class="empty">No feedback yet.</div></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { Auth, StudentAPI } from "/js/student-api.js";
+
+    const { id, role, name } = Auth.getSession();
+    if (!id || role === "doctor" || role === "admin") {
+      window.location.href = (role === "doctor" || role === "admin") ? "doctor.html" : "/";
+    }
+    document.getElementById("navName").textContent = name || "—";
+    document.getElementById("logoutBtn").addEventListener("click", () => Auth.logout());
+
+    try {
+      const data = await StudentAPI.grades(id);
+
+      document.getElementById("currentGPA").textContent = data.currentGPA != null ? Number(data.currentGPA).toFixed(2) : "N/A";
+
+      const subEl = document.getElementById("subjectList");
+      if (!data.subjects || !data.subjects.length) {
+        subEl.innerHTML = `<div class="empty">No grade records yet.</div>`;
+      } else {
+        subEl.innerHTML = data.subjects.map(s => {
+          const d = s.danger;
+          const pct = s.maxPreFinal ? Math.round((s.preFinal / s.maxPreFinal) * 100) : 0;
+          const bd  = s.breakdown || {};
+          return `
+          <div class="subject-card ${d ? "danger" : ""}">
+            <div class="subject-head">
+              <div class="subject-name">${s.name}</div>
+              <div class="grade-badge ${d ? "danger" : ""}">${s.grade || "—"}</div>
+            </div>
+            <div class="breakdown">
+              ${bd.attendance ? `<div class="breakdown-item"><div class="b-lbl">Attendance</div><div class="b-val">${bd.attendance[0]} / ${bd.attendance[1]}</div></div>` : ""}
+              ${bd.midterm   ? `<div class="breakdown-item"><div class="b-lbl">Midterm</div><div class="b-val">${bd.midterm[0]} / ${bd.midterm[1]}</div></div>` : ""}
+              ${bd.quiz1     ? `<div class="breakdown-item"><div class="b-lbl">Quiz 1</div><div class="b-val">${bd.quiz1[0]} / ${bd.quiz1[1]}</div></div>` : ""}
+              ${bd.quiz2     ? `<div class="breakdown-item"><div class="b-lbl">Quiz 2</div><div class="b-val">${bd.quiz2[0]} / ${bd.quiz2[1]}</div></div>` : ""}
+            </div>
+            <div class="progress-row">
+              <div class="p-lbl">Pre-Final</div>
+              <div class="progress-bar"><div class="progress-fill ${d ? "danger" : ""}" style="width:${pct}%"></div></div>
+              <div class="p-num">${s.preFinal} / ${s.maxPreFinal}</div>
+            </div>
+            ${s.nextTarget?.label ? `
+            <div class="next-target ${d ? "danger" : ""}">
+              <i class="fas fa-bullseye"></i>
+              <span>${s.nextTarget.label}: ${s.nextTarget.need}</span>
+            </div>` : ""}
+            ${s.staff ? `
+            <div class="contact-bar">
+              <div class="contact-item doctor">
+                <i class="fas fa-user-tie"></i>
+                <div>
+                  <div class="c-role">Doctor</div>
+                  <div class="c-name">${s.staff.doctor_name}</div>
+                  <div class="c-email"><a href="mailto:${s.staff.doctor_email}">${s.staff.doctor_email}</a></div>
+                </div>
+              </div>
+              ${s.staff.assistant_name ? `
+              <div class="contact-item assistant">
+                <i class="fas fa-user-graduate"></i>
+                <div>
+                  <div class="c-role">Assistant</div>
+                  <div class="c-name">${s.staff.assistant_name}</div>
+                  <div class="c-email"><a href="mailto:${s.staff.assistant_email}">${s.staff.assistant_email}</a></div>
+                </div>
+              </div>` : ""}
+            </div>` : ""}
+          </div>`;
+        }).join("");
+      }
+
+      const fbEl = document.getElementById("feedbackList");
+      if (!data.feedback || !data.feedback.length) {
+        fbEl.innerHTML = `<div class="empty">No feedback yet.</div>`;
+      } else {
+        fbEl.innerHTML = data.feedback.map(f => `
+          <div class="feedback-card ${f.danger ? "danger" : ""}">
+            <div class="feedback-meta">
+              <strong>${f.doctor}</strong> · ${f.subject} · ${f.created_at}
+            </div>
+            <div class="feedback-body">${f.text}</div>
+          </div>
+        `).join("");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  </script>
+</body>
+</html>

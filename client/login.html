@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Univision — Sign In</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="/js/theme.js"></script>
+</head>
+<body class="login-body">
+
+  <div class="login-wrapper">
+    <div class="login-logo"><img src="/assets/logo.png" alt="UniVision" style="height:52px;width:auto;"></div>
+
+    <div class="login-card">
+      <h2>Welcome back</h2>
+      <p class="subtitle">Select your role and enter your credentials.</p>
+
+      <!-- Role selector -->
+      <div class="role-selector">
+        <button class="role-btn active" data-role="student">
+          <i class="fas fa-user-graduate"></i><span>Student</span>
+        </button>
+        <button class="role-btn" data-role="doctor">
+          <i class="fas fa-user-tie"></i><span>Doctor</span>
+        </button>
+        <button class="role-btn" data-role="admin">
+          <i class="fas fa-user-shield"></i><span>Admin</span>
+        </button>
+      </div>
+
+      <!-- Error banner -->
+      <div class="error-msg" id="errorMsg"></div>
+
+      <!-- Login form -->
+      <form id="loginForm">
+        <div class="input-group">
+          <label id="idLabel">Student ID</label>
+          <div class="input-wrap">
+            <i class="fas fa-id-card"></i>
+            <input type="text" id="userId" placeholder="ID Number" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="userPass" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+        </div>
+
+        <div class="login-extras">
+          <label><input type="checkbox"> Remember me</label>
+          <a href="#">Forgot password?</a>
+        </div>
+
+        <button class="login-btn" type="submit" id="submitBtn">
+          Sign In <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <p class="login-footer-note">Need help? <a href="#">Help Center</a></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { Auth } from "/js/student-api.js";
+
+    // If already logged in, go to the right page
+    const { id, role } = Auth.getSession();
+    if (id) {
+      window.location.href = (role === "doctor" || role === "admin") ? "doctor.html" : "home.html";
+    }
+
+    let selectedRole = "student";
+
+    document.querySelectorAll(".role-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedRole = btn.dataset.role;
+        const labels = { student: "Student ID", doctor: "Doctor ID", admin: "Admin ID" };
+        document.getElementById("idLabel").textContent = labels[selectedRole];
+      });
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const id   = document.getElementById("userId").value.trim();
+      const pass = document.getElementById("userPass").value.trim();
+      const btn  = document.getElementById("submitBtn");
+      const err  = document.getElementById("errorMsg");
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
+      err.classList.remove("show");
+
+      const result = await Auth.login(selectedRole, id, pass);
+      if (result.ok) {
+        // Role-based redirect
+        if (result.user.role === "doctor" || result.user.role === "admin") {
+          window.location.href = "doctor.html";
+        } else {
+          window.location.href = "home.html";
+        }
+      } else {
+        err.textContent = result.error;
+        err.classList.add("show");
+        btn.disabled = false;
+        btn.innerHTML = 'Sign In <i class="fas fa-arrow-right"></i>';
+      }
+    });
+  </script>
+</body>
+</html>

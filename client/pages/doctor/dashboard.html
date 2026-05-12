@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Univision — Doctor Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── Layout ─────────────────────────────────────────── */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 0;
+      min-height: calc(100vh - var(--nav-h));
+      margin-top: var(--nav-h);
+    }
+
+    /* ── Sidebar ────────────────────────────────────────── */
+    .sidebar {
+      background: var(--card-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - var(--nav-h));
+      position: sticky;
+      top: var(--nav-h);
+      overflow: hidden;
+    }
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-header h3 { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .search-wrap { position: relative; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem; }
+    .search-wrap input {
+      width: 100%; padding: 9px 12px 9px 34px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.85rem;
+    }
+    .search-wrap input:focus { outline: none; border-color: var(--accent); }
+
+    /* Grade filter pills */
+    .grade-filter { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+    .gf-pill {
+      font-size: 0.7rem; font-weight: 700; padding: 3px 10px;
+      border-radius: 99px; cursor: pointer; border: 1px solid var(--border);
+      color: var(--text-muted); background: transparent; transition: all .15s;
+    }
+    .gf-pill:hover  { border-color: rgba(var(--accent-rgb),.3); color: var(--text-secondary); }
+    .gf-pill.active { background: rgba(var(--accent-rgb),.12); border-color: rgba(var(--accent-rgb),.35); color: var(--accent); }
+
+    /* Grade badge on student items */
+    .grade-badge {
+      font-size: 0.65rem; font-weight: 700; padding: 1px 7px;
+      border-radius: 99px; background: rgba(255,255,255,.07);
+      color: var(--text-muted); border: 1px solid var(--border);
+      float: right; margin-top: 1px;
+    }
+
+    .student-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .student-item {
+      padding: 12px 14px; border-radius: var(--radius-sm);
+      cursor: pointer; transition: all .15s; margin-bottom: 4px;
+      border: 1px solid transparent;
+    }
+    .student-item:hover { background: rgba(255,255,255,.04); }
+    .student-item.active { background: rgba(var(--accent-rgb),.08); border-color: rgba(var(--accent-rgb),.2); }
+    .student-item .s-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 2px; }
+    .student-item .s-id   { font-size: 0.72rem; color: var(--text-muted); }
+    .student-item .s-gpa  { font-size: 0.72rem; color: var(--accent); float: right; }
+
+    /* ── Main content ───────────────────────────────────── */
+    .main-content { padding: 32px; overflow-y: auto; }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 60vh; color: var(--text-muted); text-align: center;
+    }
+    .empty-state i { font-size: 3rem; margin-bottom: 16px; color: rgba(var(--accent-rgb),.2); }
+    .empty-state p { font-size: 0.9rem; }
+
+    /* ── Student header ─────────────────────────────────── */
+    .student-header {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 24px;
+    }
+    .student-header h2 { font-size: 1.5rem; font-weight: 800; }
+    .student-header .meta { font-size: 0.82rem; color: var(--text-muted); margin-top: 3px; }
+    .header-stats { display: flex; gap: 12px; }
+    .h-stat {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 18px; text-align: center;
+    }
+    .h-stat .val { font-size: 1.2rem; font-weight: 800; }
+    .h-stat .lbl { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; }
+
+    /* ── Tabs ───────────────────────────────────────────── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+    .tab-btn {
+      padding: 10px 20px; font-size: 0.88rem; font-weight: 600;
+      color: var(--text-muted); border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      border: 1px solid transparent; border-bottom: none; transition: all .15s;
+      cursor: pointer; position: relative; bottom: -1px;
+    }
+    .tab-btn:hover  { color: var(--text-secondary); }
+    .tab-btn.active {
+      color: var(--accent); background: var(--card-bg);
+      border-color: var(--border); border-bottom-color: var(--card-bg);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Table actions ──────────────────────────────────── */
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .panel-header h3 { font-size: 1rem; font-weight: 700; }
+
+    /* ── Form card ──────────────────────────────────────── */
+    .form-card {
+      background: rgba(var(--accent-rgb),.04); border: 1px solid rgba(var(--accent-rgb),.15);
+      border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+      display: none;
+    }
+    .form-card.open { display: block; }
+    .form-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 18px; color: var(--accent); }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+    .form-group label { display: block; font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 9px 12px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.88rem;
+      font-family: inherit;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { outline: none; border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-actions { display: flex; gap: 10px; margin-top: 16px; }
+
+    /* ── Danger toggle ──────────────────────────────────── */
+    .toggle-wrap { display: flex; align-items: center; gap: 10px; }
+    .toggle-wrap input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--danger); cursor: pointer; }
+
+    /* ── Toast ──────────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 20px;
+      font-size: 0.85rem; font-weight: 600;
+      transform: translateY(80px); opacity: 0;
+      transition: all .3s; pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.ok  { border-left: 4px solid var(--success); color: var(--success); }
+    #toast.err { border-left: 4px solid var(--danger);  color: var(--danger);  }
+
+    /* ── Schedule section (top-level) ──────────────────── */
+    #scheduleSection {
+      margin-top: var(--nav-h);
+      padding: 32px;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .sc-controls {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 20px;
+      margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .sc-controls label { font-size: .75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+    .sc-controls select {
+      padding: 8px 14px; background: rgba(255,255,255,.04);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--text-primary); font-size: .88rem; min-width: 240px;
+    }
+    .sc-controls select:focus { outline: none; border-color: var(--accent); }
+
+    /* ── Semester history in grades tab ─────────────────── */
+    .sem-bar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px; padding: 14px 16px;
+      background: rgba(var(--accent-rgb),.04); border: 1px solid rgba(var(--accent-rgb),.15);
+      border-radius: var(--radius);
+    }
+    .sem-bar label { font-size: .75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
+    .sem-bar select {
+      padding: 7px 12px; background: rgba(255,255,255,.04);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--text-primary); font-size: .85rem; flex: 1; max-width: 300px;
+    }
+    .sem-bar select:focus { outline: none; border-color: var(--accent); }
+    #semHistoryPanel {
+      margin-bottom: 24px; display: none;
+    }
+    #semHistoryPanel .sem-stat-row {
+      display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    #semHistoryPanel .sem-stat {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 18px; text-align: center; flex: 1; min-width: 100px;
+    }
+    #semHistoryPanel .sem-stat .val { font-size: 1.1rem; font-weight: 800; color: var(--accent); }
+    #semHistoryPanel .sem-stat .lbl { font-size: .65rem; color: var(--text-muted); text-transform: uppercase; }
+
+    @media (max-width: 900px) {
+      .dashboard { grid-template-columns: 1fr; }
+      .sidebar { height: auto; position: static; }
+    }
+  </style>
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+
+  <!-- ── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="/assets/logo.png" alt="UniVision" style="height:52px;width:auto;">
+      </div>
+      <div class="nav-user">
+        <span>Doctor</span>
+        <strong id="navName">—</strong>
+      </div>
+    </div>
+    <ul class="nav-menu">
+      <li class="nav-item active" id="navItemDashboard">
+        <a href="#" id="navDashboardLink"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+      </li>
+      <li class="nav-item" id="navItemSchedule">
+        <a href="#" id="navScheduleLink"><i class="fas fa-clock"></i><span>Schedule</span></a>
+      </li>
+    </ul>
+    <button id="logoutBtn" style="
+      display:flex;align-items:center;gap:7px;padding:8px 14px;
+      border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;
+      color:var(--danger);border:1px solid rgba(239,68,68,.25);
+      background:rgba(239,68,68,.06);cursor:pointer;transition:all .2s;">
+      <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+    </button>
+  </nav>
+
+  <!-- ── Dashboard layout ──────────────────────────────── -->
+  <div class="dashboard">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3>Students</h3>
+        <div class="search-wrap">
+          <i class="fas fa-search"></i>
+          <input type="text" id="studentSearch" placeholder="Search by name or ID…">
+        </div>
+        <div class="grade-filter" id="gradeFilter">
+          <button class="gf-pill active" data-grade="0">All</button>
+          <button class="gf-pill" data-grade="1">Grade 1</button>
+          <button class="gf-pill" data-grade="2">Grade 2</button>
+          <button class="gf-pill" data-grade="3">Grade 3</button>
+          <button class="gf-pill" data-grade="4">Grade 4</button>
+        </div>
+      </div>
+      <div class="student-list" id="studentList">
+        <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:.82rem;">Loading…</div>
+      </div>
+      <div id="addStudentWrap" style="display:none;padding:12px;border-top:1px solid var(--border);">
+        <button id="addStudentBtn" class="btn btn-accent" style="width:100%;justify-content:center;">
+          <i class="fas fa-user-plus"></i> Add New Student
+        </button>
+      </div>
+    </aside>
+
+    <!-- Add Student Modal -->
+    <div id="addStudentModal" style="
+      display:none;position:fixed;inset:0;z-index:200;
+      background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+      align-items:center;justify-content:center;">
+      <div style="
+        background:var(--card-bg);border:1px solid var(--border);
+        border-radius:var(--radius);padding:32px;width:100%;max-width:560px;
+        max-height:90vh;overflow-y:auto;margin:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <h3 style="font-size:1.1rem;font-weight:800;"><i class="fas fa-user-plus" style="color:var(--accent);margin-right:8px;"></i>Add New Student</h3>
+          <button id="closeStudentModal" style="background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Student ID <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="ns_id" placeholder="e.g. 29803050202397">
+          </div>
+          <div class="form-group">
+            <label>Password <span style="color:var(--danger)">*</span></label>
+            <input type="password" id="ns_pass" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>Full Name (English) <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="ns_name" placeholder="e.g. Ahmed Ali">
+          </div>
+          <div class="form-group">
+            <label>Full Name (Arabic)</label>
+            <input type="text" id="ns_name_ar" placeholder="أحمد علي" dir="rtl">
+          </div>
+          <div class="form-group">
+            <label>National ID</label>
+            <input type="text" id="ns_national_id" placeholder="National ID number">
+          </div>
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" id="ns_dob">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" id="ns_phone" placeholder="01XXXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label>Personal Email</label>
+            <input type="email" id="ns_email" placeholder="student@email.com">
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="ns_gender">
+              <option value="">— Select —</option>
+              <option value="ذكر">ذكر (Male)</option>
+              <option value="أنثى">أنثى (Female)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nationality</label>
+            <input type="text" id="ns_nationality" placeholder="e.g. مصر">
+          </div>
+          <div class="form-group">
+            <label>Grade / Year <span style="color:var(--danger)">*</span></label>
+            <select id="ns_grade">
+              <option value="1">Grade 1 — Freshman</option>
+              <option value="2">Grade 2 — Sophomore</option>
+              <option value="3">Grade 3 — Junior</option>
+              <option value="4">Grade 4 — Senior</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Address</label>
+            <input type="text" id="ns_address" placeholder="Full address">
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:.75rem;color:var(--text-muted);">
+          University email will be set automatically as <em>ID@student.eelu.edu.eg</em>
+        </div>
+        <div class="form-actions" style="margin-top:20px;">
+          <button class="btn btn-accent" id="saveStudentBtn"><i class="fas fa-user-plus"></i> Create Student</button>
+          <button class="btn btn-ghost"  id="cancelStudentBtn"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main panel -->
+    <div class="main-content" id="mainContent">
+      <div class="empty-state">
+        <i class="fas fa-user-graduate"></i>
+        <p>Select a student from the list<br>to view and manage their records.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Schedule Section (top-level, separate from student data) ── -->
+  <div id="scheduleSection" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <h2 style="font-size:1.4rem;font-weight:800;"><i class="fas fa-clock" style="color:var(--accent);margin-right:10px;"></i>Lecture Schedule Management</h2>
+    </div>
+
+    <div class="sc-controls">
+      <label><i class="fas fa-layer-group" style="margin-right:6px;"></i>Semester / Grade</label>
+      <select id="scSemesterSel">
+        <option value="">— Select a semester —</option>
+        <option value="1">Grade 1 — Semester 1</option>
+        <option value="2">Grade 1 — Semester 2</option>
+        <option value="3">Grade 2 — Semester 3</option>
+        <option value="4">Grade 2 — Semester 4</option>
+        <option value="5">Grade 3 — Semester 5</option>
+        <option value="6">Grade 3 — Semester 6</option>
+        <option value="7">Grade 4 — Semester 7</option>
+        <option value="8">Grade 4 — Semester 8</option>
+      </select>
+      <button class="btn btn-accent" id="scAddBtn" style="display:none;"><i class="fas fa-plus"></i> Add Entry</button>
+    </div>
+
+    <div class="form-card" id="scSectionForm">
+      <h4><i class="fas fa-edit"></i> Schedule Entry</h4>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Course Name</label>
+          <input type="text" id="scs_course" placeholder="e.g. Human Resources">
+        </div>
+        <div class="form-group">
+          <label>Day</label>
+          <select id="scs_day">
+            <option value="Sunday">Sunday</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="scs_type">
+            <option value="Lecture">Lecture</option>
+            <option value="Lab">Lab</option>
+            <option value="Tutorial">Tutorial</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Start Time</label>
+          <input type="time" id="scs_start">
+        </div>
+        <div class="form-group">
+          <label>End Time</label>
+          <input type="time" id="scs_end">
+        </div>
+        <div class="form-group">
+          <label>Location / Room</label>
+          <input type="text" id="scs_location" placeholder="e.g. Hall B-204">
+        </div>
+        <div class="form-group">
+          <label>Doctor Name</label>
+          <input type="text" id="scs_doctor" placeholder="e.g. Dr. Ahmed">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-accent" id="scsSaveBtn"><i class="fas fa-save"></i> Save</button>
+        <button class="btn btn-ghost"  id="scsCancelBtn"><i class="fas fa-times"></i> Cancel</button>
+      </div>
+    </div>
+
+    <div id="scSectionTableWrap" style="display:none;">
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table" id="scSectionTable">
+          <thead><tr>
+            <th>Day</th><th>Course</th><th>Type</th><th>Time</th><th>Location</th><th>Doctor</th><th></th>
+          </tr></thead>
+          <tbody id="scSectionTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="scSectionEmpty" style="text-align:center;color:var(--text-muted);padding:60px;display:none;">
+      <i class="fas fa-clock" style="font-size:2.5rem;margin-bottom:16px;opacity:.2;display:block;"></i>
+      <p>Select a semester above to manage the lecture schedule.</p>
+    </div>
+  </div>
+
+  <!-- ── Toast ─────────────────────────────────────────── -->
+  <div id="toast"></div>
+
+  <script type="module">
+    import { Auth, DoctorAPI } from "/js/doctor-api.js";
+
+    // ── Guard ──────────────────────────────────────────────
+    Auth.requireAuth();
+    const session = Auth.getSession();
+    if (session.role !== "doctor" && session.role !== "admin") {
+      window.location.href = "home.html";
+    }
+    document.getElementById("navName").textContent  = session.name || "—";
+    document.getElementById("logoutBtn").addEventListener("click", () => Auth.logout());
+
+    // ── Admin: Add Student ─────────────────────────────────
+    if (session.role === "admin") {
+      document.getElementById("addStudentWrap").style.display = "block";
+
+      const modal    = document.getElementById("addStudentModal");
+      const openModal  = () => { modal.style.display = "flex"; };
+      const closeModal = () => {
+        modal.style.display = "none";
+        ["ns_id","ns_pass","ns_name","ns_name_ar","ns_national_id",
+         "ns_phone","ns_email","ns_address","ns_nationality"].forEach(id => {
+          document.getElementById(id).value = "";
+        });
+        document.getElementById("ns_dob").value    = "";
+        document.getElementById("ns_gender").value = "";
+        document.getElementById("ns_grade").value  = "1";
+      };
+
+      document.getElementById("addStudentBtn").addEventListener("click", openModal);
+      document.getElementById("closeStudentModal").addEventListener("click", closeModal);
+      document.getElementById("cancelStudentBtn").addEventListener("click", closeModal);
+      modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+
+      document.getElementById("saveStudentBtn").addEventListener("click", async () => {
+        const data = {
+          id:          document.getElementById("ns_id").value.trim(),
+          password:    document.getElementById("ns_pass").value,
+          name:        document.getElementById("ns_name").value.trim(),
+          name_ar:     document.getElementById("ns_name_ar").value.trim(),
+          national_id: document.getElementById("ns_national_id").value.trim(),
+          dob:         document.getElementById("ns_dob").value,
+          phone:       document.getElementById("ns_phone").value.trim(),
+          email:       document.getElementById("ns_email").value.trim(),
+          gender:      document.getElementById("ns_gender").value,
+          nationality: document.getElementById("ns_nationality").value.trim(),
+          address:     document.getElementById("ns_address").value.trim(),
+          grade:       Number(document.getElementById("ns_grade").value),
+        };
+        if (!data.id)       return toast("Student ID is required", "err");
+        if (!data.name)     return toast("Student name is required", "err");
+        if (!data.password) return toast("Password is required", "err");
+        try {
+          await DoctorAPI.addStudent(data);
+          toast(`Student ${data.name} created ✓`);
+          closeModal();
+          allStudents = await DoctorAPI.getStudents();
+          renderStudentList(filteredStudents());
+        } catch(e) { toast(e.message, "err"); }
+      });
+    }
+
+    // ── Toast helper ───────────────────────────────────────
+    let toastTimer;
+    function toast(msg, type = "ok") {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className   = `show ${type}`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = ""; }, 3000);
+    }
+
+    // ── Grade point map ─────────────────────────────────────
+    const GRADE_OPTIONS = ["A+","A","A-","B+","B","B-","C+","C","C-","D+","D","F"];
+
+    // ── State ──────────────────────────────────────────────
+    let allStudents   = [];
+    let selectedId    = null;
+    let activeTab     = "grades";
+    let activeGrade   = 0;      // 0 = all grades
+    let _gradeRows    = [];
+    let _attRows      = [];
+    let _fbRows       = [];
+    let _editingFbId  = null;
+    let _editingAdminFbId = null;
+
+    // ── Load student list ──────────────────────────────────
+    allStudents = await DoctorAPI.getStudents();
+    renderStudentList(allStudents);
+
+    function filteredStudents(q = "") {
+      return allStudents.filter(s =>
+        (activeGrade === 0 || s.grade === activeGrade) &&
+        (s.name.toLowerCase().includes(q) || (s.name_en||"").toLowerCase().includes(q) || s.id.includes(q))
+      );
+    }
+
+    document.getElementById("studentSearch").addEventListener("input", e => {
+      renderStudentList(filteredStudents(e.target.value.toLowerCase()));
+    });
+
+    document.getElementById("gradeFilter").addEventListener("click", e => {
+      const pill = e.target.closest(".gf-pill");
+      if (!pill) return;
+      activeGrade = Number(pill.dataset.grade);
+      document.querySelectorAll(".gf-pill").forEach(p =>
+        p.classList.toggle("active", p === pill)
+      );
+      const q = document.getElementById("studentSearch").value.toLowerCase();
+      renderStudentList(filteredStudents(q));
+    });
+
+    function renderStudentList(list) {
+      const el = document.getElementById("studentList");
+      if (!list.length) {
+        el.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:.82rem;">No students found</div>`;
+        return;
+      }
+      const GRADE_LABEL = { 1:"Yr 1", 2:"Yr 2", 3:"Yr 3", 4:"Yr 4" };
+      el.innerHTML = list.map(s => `
+        <div class="student-item ${s.id === selectedId ? 'active' : ''}" data-id="${s.id}">
+          <span class="s-gpa">${s.gpa ? Number(s.gpa).toFixed(2) : '—'}</span>
+          <span class="grade-badge">${GRADE_LABEL[s.grade] || '—'}</span>
+          <div class="s-name">${s.name_en || s.name}</div>
+          <div class="s-id">${s.id}</div>
+        </div>
+      `).join("");
+
+      el.querySelectorAll(".student-item").forEach(el => {
+        el.addEventListener("click", () => selectStudent(el.dataset.id));
+      });
+    }
+
+    // ── Select student ─────────────────────────────────────
+    async function selectStudent(id) {
+      selectedId = id;
+      renderStudentList(filteredStudents(document.getElementById("studentSearch").value.toLowerCase()));
+
+      const main = document.getElementById("mainContent");
+      main.innerHTML = `<div style="color:var(--text-muted);padding:40px;text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading…</div>`;
+
+      const [info, grades, attendance, feedback, semesters] = await Promise.all([
+        DoctorAPI.getStudent(id),
+        DoctorAPI.getGrades(id),
+        DoctorAPI.getAttendance(id),
+        DoctorAPI.getFeedback(id),
+        DoctorAPI.getSemesters(id),
+      ]);
+
+      main.innerHTML = buildDashboard(info, grades, attendance, feedback);
+      bindDashboard(id, grades, attendance, feedback, semesters);
+      switchTab(activeTab);
+    }
+
+    // ── Build dashboard HTML ───────────────────────────────
+    function buildDashboard(info, grades, attendance, feedback) {
+      const p = info.profile;
+      return `
+        <div class="student-header fade-up">
+          <div>
+            <h2>${p.name_en}</h2>
+            <div class="meta">ID: ${p.student_id} &nbsp;·&nbsp; ${p.university_email}</div>
+          </div>
+          <div class="header-stats">
+            <div class="h-stat">
+              <div class="val" style="color:var(--accent);">${info.gpa ? Number(info.gpa).toFixed(2) : '—'}</div>
+              <div class="lbl">GPA</div>
+            </div>
+            <div class="h-stat">
+              <div class="val" style="color:var(--success);">${info.attendance?.percentage ?? '—'}%</div>
+              <div class="lbl">Attendance</div>
+            </div>
+            <div class="h-stat">
+              <div class="val" style="color:var(--info);">${grades.length}</div>
+              <div class="lbl">Courses</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab-btn" data-tab="grades">
+            <i class="fas fa-graduation-cap"></i> Grades (${grades.length})
+          </button>
+          <button class="tab-btn" data-tab="attendance">
+            <i class="fas fa-calendar-check"></i> Attendance (${attendance.length})
+          </button>
+          <button class="tab-btn" data-tab="feedback">
+            <i class="fas fa-comment-dots"></i> Feedback (${feedback.length})
+          </button>
+        </div>
+
+        <!-- ── Grades panel ── -->
+        <div class="tab-panel" id="tab-grades">
+          <div class="sem-bar">
+            <label><i class="fas fa-calendar-alt" style="margin-right:5px;"></i>Semester History</label>
+            <select id="semHistorySel"><option value="">Loading…</option></select>
+          </div>
+          <div id="semHistoryPanel">
+            <div class="sem-stat-row" id="semStatRow"></div>
+            <div class="card" style="padding:0;overflow:hidden;margin-bottom:20px;">
+              <table class="data-table" id="semCoursesTable">
+                <thead><tr>
+                  <th>Course</th><th>Credits</th><th>Grade</th><th>Points</th><th>Progress</th>
+                </tr></thead>
+                <tbody id="semCoursesTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel-header">
+            <h3><i class="fas fa-graduation-cap" style="color:var(--accent);"></i> Current Grade Records</h3>
+            <button class="btn btn-accent" id="addGradeBtn"><i class="fas fa-plus"></i> Add / Update Grade</button>
+          </div>
+
+          <div class="form-card" id="gradeForm">
+            <h4><i class="fas fa-edit"></i> Grade Entry</h4>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label>Course Name</label>
+                <input type="text" id="g_course" placeholder="e.g. Human Resources">
+              </div>
+              <div class="form-group">
+                <label>Grade</label>
+                <select id="g_grade">
+                  ${GRADE_OPTIONS.map(g => `<option>${g}</option>`).join("")}
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Attendance (got / max)</label>
+                <div style="display:flex;gap:6px;">
+                  <input type="number" id="g_att" placeholder="got" min="0" style="flex:1;">
+                  <input type="number" id="g_att_max" placeholder="max" min="1" value="10" style="flex:1;">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Midterm (got / max)</label>
+                <div style="display:flex;gap:6px;">
+                  <input type="number" id="g_mid" placeholder="got" min="0" style="flex:1;">
+                  <input type="number" id="g_mid_max" placeholder="max" min="1" value="30" style="flex:1;">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Quiz 1 (got / max)</label>
+                <div style="display:flex;gap:6px;">
+                  <input type="number" id="g_q1" placeholder="got" min="0" style="flex:1;">
+                  <input type="number" id="g_q1_max" placeholder="max" min="1" value="10" style="flex:1;">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Quiz 2 (got / max)</label>
+                <div style="display:flex;gap:6px;">
+                  <input type="number" id="g_q2" placeholder="got" min="0" style="flex:1;">
+                  <input type="number" id="g_q2_max" placeholder="max" min="1" value="10" style="flex:1;">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Next Target Label</label>
+                <input type="text" id="g_tlabel" placeholder="e.g. Target for A+">
+              </div>
+              <div class="form-group">
+                <label>Next Target Need</label>
+                <input type="text" id="g_tneed" placeholder="e.g. 36/40 in Final">
+              </div>
+              <div class="form-group full">
+                <label>Mark as At-Risk</label>
+                <div class="toggle-wrap">
+                  <input type="checkbox" id="g_danger">
+                  <span style="font-size:.85rem;color:var(--text-secondary);">Flag this course as danger (will appear in red)</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-accent" id="saveGradeBtn"><i class="fas fa-save"></i> Save</button>
+              <button class="btn btn-ghost"  id="cancelGradeBtn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden;">
+            <table class="data-table" id="gradesTable">
+              <thead><tr>
+                <th>Course</th><th>Grade</th><th>Pre-Final</th>
+                <th>Att</th><th>Midterm</th><th>Q1</th><th>Q2</th><th>At-Risk</th><th></th>
+              </tr></thead>
+              <tbody id="gradesTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── Attendance panel ── -->
+        <div class="tab-panel" id="tab-attendance">
+          <div class="panel-header">
+            <h3><i class="fas fa-calendar-check" style="color:var(--success);"></i> Attendance Records</h3>
+            <button class="btn btn-accent" id="addAttBtn"><i class="fas fa-plus"></i> Add / Update</button>
+          </div>
+
+          <div class="form-card" id="attForm">
+            <h4><i class="fas fa-edit"></i> Attendance Entry</h4>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label>Course Name</label>
+                <input type="text" id="a_course" placeholder="e.g. Marketing">
+              </div>
+              <div class="form-group">
+                <label>Lectures Attended</label>
+                <input type="number" id="a_attended" placeholder="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>Total Lectures</label>
+                <input type="number" id="a_total" placeholder="0" min="1">
+              </div>
+            </div>
+            <p style="font-size:.78rem;color:var(--text-muted);margin-top:10px;">
+              Status and message are calculated automatically based on the percentage.
+            </p>
+            <div class="form-actions">
+              <button class="btn btn-accent" id="saveAttBtn"><i class="fas fa-save"></i> Save</button>
+              <button class="btn btn-ghost"  id="cancelAttBtn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden;">
+            <table class="data-table" id="attTable">
+              <thead><tr>
+                <th>Course</th><th>Attended</th><th>Total</th><th>%</th><th>Status</th><th>Message</th><th></th>
+              </tr></thead>
+              <tbody id="attTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── Feedback panel ── -->
+        <div class="tab-panel" id="tab-feedback">
+          <div class="panel-header">
+            <h3><i class="fas fa-comment-dots" style="color:var(--warning);"></i> Academic Feedback</h3>
+            <button class="btn btn-accent" id="addFbBtn"><i class="fas fa-plus"></i> Add Feedback</button>
+          </div>
+
+           <div class="form-card" id="fbForm">
+            <h4><i class="fas fa-edit"></i> New Feedback</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Course Name</label>
+                <input type="text" id="f_course" placeholder="e.g. Economics">
+              </div>
+              <div class="form-group" id="fbSendToWrap" style="display:none;">
+                <label>Send To</label>
+                <select id="f_sendto" style="width:100%;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-size:.9rem;font-family:inherit;">
+                  <option value="student">Student (visible to student)</option>
+                  <option value="doctor">Doctor Only (private to doctor)</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label>Feedback Message</label>
+                <textarea id="f_body" placeholder="Write your feedback for the student…" rows="4"></textarea>
+              </div>
+              <div class="form-group full">
+                <label>Mark as Urgent</label>
+                <div class="toggle-wrap">
+                  <input type="checkbox" id="f_danger">
+                  <span style="font-size:.85rem;color:var(--text-secondary);">Flag this feedback as urgent (appears highlighted in red)</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-accent" id="saveFbBtn"><i class="fas fa-paper-plane"></i> Send</button>
+              <button class="btn btn-ghost"  id="cancelFbBtn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+          </div>
+
+          <div id="feedbackList" style="display:grid;gap:14px;"></div>
+        </div>
+
+      `;
+    }
+
+    // ── Bind dashboard events ──────────────────────────────
+    function bindDashboard(sid, grades, attendance, feedback, semesters) {
+
+      // Tabs
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeTab = btn.dataset.tab;
+          switchTab(activeTab);
+        });
+      });
+
+      // ── Semester history dropdown ──────────────────────────
+      const semSel = document.getElementById("semHistorySel");
+      const semPanel = document.getElementById("semHistoryPanel");
+      semSel.innerHTML = semesters.length
+        ? `<option value="">— View semester history —</option>` +
+          semesters.map(s => `<option value="${s.id}">${s.label} &nbsp;·&nbsp; GPA ${Number(s.gpa).toFixed(2)}</option>`).join("")
+        : `<option value="">No semester history yet</option>`;
+
+      function renderSemHistory(semId) {
+        if (!semId) { semPanel.style.display = "none"; return; }
+        const sem = semesters.find(s => String(s.id) === String(semId));
+        if (!sem) return;
+        semPanel.style.display = "block";
+        document.getElementById("semStatRow").innerHTML = `
+          <div class="sem-stat"><div class="val">${Number(sem.gpa).toFixed(2)}</div><div class="lbl">GPA</div></div>
+          <div class="sem-stat"><div class="val">${sem.credits}</div><div class="lbl">Credits</div></div>
+          <div class="sem-stat"><div class="val">${sem.attendance_pct}%</div><div class="lbl">Attendance</div></div>
+          <div class="sem-stat"><div class="val">${sem.courses.length}</div><div class="lbl">Courses</div></div>
+        `;
+        const gradeColor = { A:true,"A+":true,"A-":true };
+        document.getElementById("semCoursesTbody").innerHTML = sem.courses.length
+          ? sem.courses.map(c => `
+              <tr>
+                <td style="font-weight:600;">${c.name}</td>
+                <td>${c.credits}</td>
+                <td><span class="badge ${c.grade === 'F' ? 'badge-danger' : gradeColor[c.grade] ? 'badge-success' : 'badge-accent'}">${c.grade}</span></td>
+                <td>${Number(c.grade_points).toFixed(1)}</td>
+                <td>
+                  <div style="background:rgba(255,255,255,.07);border-radius:99px;height:6px;width:100%;min-width:80px;">
+                    <div class="progress-fill" style="background:var(--accent);height:6px;border-radius:99px;width:${c.progress}%;"></div>
+                  </div>
+                  <span style="font-size:.7rem;color:var(--text-muted);">${c.progress}%</span>
+                </td>
+              </tr>`)
+            .join("")
+          : `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">No courses recorded</td></tr>`;
+      }
+
+      // Default: show most recent semester
+      if (semesters.length) {
+        semSel.value = semesters[0].id;
+        renderSemHistory(semesters[0].id);
+      }
+      semSel.addEventListener("change", () => renderSemHistory(semSel.value));
+
+      // ── Grades ────────────────────────────────────────────
+      renderGradeRows(grades);
+
+      const gradeForm   = document.getElementById("gradeForm");
+      const addGradeBtn = document.getElementById("addGradeBtn");
+      addGradeBtn.addEventListener("click", () => {
+        gradeForm.classList.toggle("open");
+        if (gradeForm.classList.contains("open")) addGradeBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Form';
+        else addGradeBtn.innerHTML = '<i class="fas fa-plus"></i> Add / Update Grade';
+      });
+      document.getElementById("cancelGradeBtn").addEventListener("click", () => {
+        gradeForm.classList.remove("open");
+        addGradeBtn.innerHTML = '<i class="fas fa-plus"></i> Add / Update Grade';
+        document.getElementById("g_course").readOnly = false;
+        document.getElementById("g_course").style.opacity = "";
+      });
+
+      document.getElementById("saveGradeBtn").addEventListener("click", async () => {
+        const data = {
+          course_name:      document.getElementById("g_course").value.trim(),
+          grade:            document.getElementById("g_grade").value,
+          att_score:        +document.getElementById("g_att").value,
+          att_max:          +document.getElementById("g_att_max").value,
+          midterm_score:    +document.getElementById("g_mid").value,
+          midterm_max:      +document.getElementById("g_mid_max").value,
+          quiz1_score:      +document.getElementById("g_q1").value,
+          quiz1_max:        +document.getElementById("g_q1_max").value,
+          quiz2_score:      +document.getElementById("g_q2").value,
+          quiz2_max:        +document.getElementById("g_q2_max").value,
+          next_target_label:document.getElementById("g_tlabel").value.trim(),
+          next_target_need: document.getElementById("g_tneed").value.trim(),
+          is_danger:        document.getElementById("g_danger").checked,
+        };
+        if (!data.course_name) return toast("Course name is required", "err");
+        try {
+          const res = await DoctorAPI.saveGrade(sid, data);
+          toast(`Grade ${res.action} for ${data.course_name} ✓`);
+          gradeForm.classList.remove("open");
+          addGradeBtn.innerHTML = '<i class="fas fa-plus"></i> Add / Update Grade';
+          document.getElementById("g_course").readOnly = false;
+          document.getElementById("g_course").style.opacity = "";
+          const updated = await DoctorAPI.getGrades(sid);
+          renderGradeRows(updated);
+        } catch(e) { toast(e.message, "err"); }
+      });
+
+      // ── Attendance ────────────────────────────────────────
+      renderAttRows(attendance);
+
+      const attForm   = document.getElementById("attForm");
+      const addAttBtn = document.getElementById("addAttBtn");
+      addAttBtn.addEventListener("click", () => {
+        attForm.classList.toggle("open");
+        if (attForm.classList.contains("open")) addAttBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Form';
+        else addAttBtn.innerHTML = '<i class="fas fa-plus"></i> Add / Update';
+      });
+      document.getElementById("cancelAttBtn").addEventListener("click", () => {
+        attForm.classList.remove("open");
+        addAttBtn.innerHTML = '<i class="fas fa-plus"></i> Add / Update';
+        document.getElementById("a_course").readOnly = false;
+        document.getElementById("a_course").style.opacity = "";
+      });
+
+      document.getElementById("saveAttBtn").addEventListener("click", async () => {
+        const data = {
+          course_name: document.getElementById("a_course").value.trim(),
+          attended:    +document.getElementById("a_attended").value,
+          total:       +document.getElementById("a_total").value,
+        };
+        if (!data.course_name) return toast("Course name is required", "err");
+        if (!data.total)       return toast("Total lectures is required", "err");
+        if (data.attended > data.total) return toast("Attended cannot exceed total", "err");
+        try {
+          const res = await DoctorAPI.saveAttendance(sid, data);
+          toast(`Attendance ${res.action} for ${data.course_name} ✓`);
+          attForm.classList.remove("open");
+          addAttBtn.innerHTML = '<i class="fas fa-plus"></i> Add / Update';
+          document.getElementById("a_course").readOnly = false;
+          document.getElementById("a_course").style.opacity = "";
+          const updated = await DoctorAPI.getAttendance(sid);
+          renderAttRows(updated);
+        } catch(e) { toast(e.message, "err"); }
+      });
+
+      // ── Feedback ──────────────────────────────────────────
+      // Show "Send to" selector if admin
+      if (session.role === "admin") {
+        document.getElementById("fbSendToWrap").style.display = "";
+      }
+
+      // Load and render both student feedback and admin feedback
+      async function loadAllFeedback() {
+        const studentFb = await DoctorAPI.getFeedback(sid);
+        let adminFb = [];
+        try { adminFb = await DoctorAPI.getAdminFeedback(sid); } catch {}
+        renderFeedback(studentFb, adminFb);
+      }
+      loadAllFeedback();
+
+      const fbForm   = document.getElementById("fbForm");
+      const addFbBtn = document.getElementById("addFbBtn");
+      addFbBtn.addEventListener("click", () => {
+        fbForm.classList.toggle("open");
+        if (fbForm.classList.contains("open")) addFbBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Form';
+        else addFbBtn.innerHTML = '<i class="fas fa-plus"></i> Add Feedback';
+      });
+      document.getElementById("cancelFbBtn").addEventListener("click", () => {
+        fbForm.classList.remove("open");
+        addFbBtn.innerHTML = '<i class="fas fa-plus"></i> Add Feedback';
+        document.getElementById("f_course").readOnly = false;
+        document.getElementById("f_course").style.opacity = "";
+        _editingFbId = null;
+        _editingAdminFbId = null;
+        if (session.role === "admin") document.getElementById("f_sendto").value = "student";
+      });
+
+      document.getElementById("saveFbBtn").addEventListener("click", async () => {
+        const sendTo = session.role === "admin" ? document.getElementById("f_sendto").value : "student";
+        const data = {
+          course_name: document.getElementById("f_course").value.trim(),
+          body:        document.getElementById("f_body").value.trim(),
+          is_danger:   document.getElementById("f_danger").checked,
+          is_urgent:   document.getElementById("f_danger").checked,
+        };
+        if (!data.course_name) return toast("Course name is required", "err");
+        if (!data.body)        return toast("Feedback message is required", "err");
+        try {
+          if (_editingAdminFbId) {
+            await DoctorAPI.updateAdminFeedback(_editingAdminFbId, data);
+            toast("Admin feedback updated ✓");
+            _editingAdminFbId = null;
+          } else if (_editingFbId) {
+            await DoctorAPI.updateFeedback(_editingFbId, data);
+            toast("Feedback updated ✓");
+            _editingFbId = null;
+          } else if (sendTo === "doctor") {
+            await DoctorAPI.sendAdminFeedback(sid, data);
+            toast("Feedback sent to doctor (private) ✓");
+          } else {
+            await DoctorAPI.addFeedback(sid, data);
+            toast("Feedback sent to student ✓");
+          }
+          fbForm.classList.remove("open");
+          addFbBtn.innerHTML = '<i class="fas fa-plus"></i> Add Feedback';
+          document.getElementById("f_course").readOnly = false;
+          document.getElementById("f_course").style.opacity = "";
+          document.getElementById("f_course").value    = "";
+          document.getElementById("f_body").value      = "";
+          document.getElementById("f_danger").checked  = false;
+          if (session.role === "admin") document.getElementById("f_sendto").value = "student";
+          _editingFbId = null;
+          _editingAdminFbId = null;
+          loadAllFeedback();
+        } catch(e) { toast(e.message, "err"); }
+      });
+    }
+
+    // ── Render helpers ─────────────────────────────────────
+    function renderGradeRows(rows) {
+      const tbody = document.getElementById("gradesTbody");
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:24px;">No grade records yet.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td style="font-weight:600;">${r.course_name}</td>
+          <td><span class="badge ${r.is_danger ? 'badge-danger' : 'badge-accent'}">${r.grade}</span></td>
+          <td>${r.pre_final}/${r.max_pre_final}</td>
+          <td>${r.att_score}/${r.att_max}</td>
+          <td>${r.midterm_score}/${r.midterm_max}</td>
+          <td>${r.quiz1_score}/${r.quiz1_max}</td>
+          <td>${r.quiz2_score}/${r.quiz2_max}</td>
+          <td>${r.is_danger ? '<span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> Yes</span>' : '<span class="badge badge-success">No</span>'}</td>
+          <td style="display:flex;gap:6px;">
+            <button class="btn btn-ghost" style="padding:5px 10px;font-size:.75rem;border-color:rgba(var(--accent-rgb),.25);color:var(--accent);"
+              onclick="editGrade(${r.id})">
+              <i class="fas fa-pen"></i>
+            </button>
+            <button class="btn btn-danger" style="padding:5px 10px;font-size:.75rem;"
+              onclick="deleteGrade(${r.id})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderAttRows(rows) {
+      const tbody = document.getElementById("attTbody");
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">No attendance records yet.</td></tr>`;
+        return;
+      }
+      const statusBadge = { safe: "badge-success", warning: "badge-warning", danger: "badge-danger" };
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td style="font-weight:600;">${r.course_name}</td>
+          <td>${r.attended}</td>
+          <td>${r.total}</td>
+          <td><strong style="color:${r.percentage < 75 ? 'var(--danger)' : 'var(--success)'};">${r.percentage}%</strong></td>
+          <td><span class="badge ${statusBadge[r.status]}">${r.status}</span></td>
+          <td style="font-size:.8rem;color:var(--text-muted);">${r.message}</td>
+          <td style="display:flex;gap:6px;">
+            <button class="btn btn-ghost" style="padding:5px 10px;font-size:.75rem;border-color:rgba(var(--accent-rgb),.25);color:var(--accent);"
+              onclick="editAtt(${r.id})">
+              <i class="fas fa-pen"></i>
+            </button>
+            <button class="btn btn-danger" style="padding:5px 10px;font-size:.75rem;"
+              onclick="deleteAtt(${r.id})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderFeedback(studentRows, adminRows) {
+      adminRows = adminRows || [];
+      const el = document.getElementById("feedbackList");
+      const allEmpty = !studentRows.length && !adminRows.length;
+      if (allEmpty) {
+        el.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px;font-size:.88rem;">No feedback yet.</div>`;
+        return;
+      }
+
+      const timeAgo = (dateStr) => {
+        const d = new Date(dateStr);
+        const days = Math.round((Date.now() - d) / 86400000);
+        return days === 0 ? "Today" : days === 1 ? "Yesterday" : `${days} days ago`;
+      };
+
+      let html = "";
+
+      // Render student feedback
+      html += studentRows.map(f => {
+        const color  = f.is_danger ? "var(--danger)" : "var(--accent)";
+        const bg     = f.is_danger ? "rgba(239,68,68,.04)" : "var(--card-bg)";
+        const border = f.is_danger ? "rgba(239,68,68,.12)" : "var(--border)";
+        return `
+          <div class="feedback-card" style="background:${bg};border:1px solid ${border};border-right:4px solid ${color};position:relative;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <h4 style="color:${color};">${f.course_name} — ${f.doctor_name}</h4>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="meta">${timeAgo(f.created_at)}</span>
+                <button class="btn btn-ghost" style="padding:4px 10px;font-size:.72rem;border-color:rgba(var(--accent-rgb),.25);color:var(--accent);"
+                  onclick="editFb(${f.id})">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button class="btn btn-danger" style="padding:4px 10px;font-size:.72rem;"
+                  onclick="deleteFb(${f.id})">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <p>${f.body}</p>
+          </div>
+        `;
+      }).join("");
+
+      // Render admin feedback (visible to doctor & admin only, visually distinct)
+      if (adminRows.length && (session.role === "admin" || session.role === "doctor")) {
+        html += `<div style="margin-top:20px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+          <i class="fas fa-user-shield" style="color:var(--info);font-size:.85rem;"></i>
+          <span style="font-weight:700;font-size:.82rem;color:var(--info);text-transform:uppercase;letter-spacing:.5px;">Admin → Doctor Feedback</span>
+        </div>`;
+        html += adminRows.map(af => {
+          const urgent = af.is_urgent;
+          const color  = urgent ? "var(--danger)" : "var(--info, #60a5fa)";
+          const bg     = urgent ? "rgba(239,68,68,.06)" : "rgba(96,165,250,.06)";
+          const border = urgent ? "rgba(239,68,68,.2)" : "rgba(96,165,250,.2)";
+          const editBtns = session.role === "admin" ? `
+                <button class="btn btn-ghost" style="padding:4px 10px;font-size:.72rem;border-color:rgba(96,165,250,.25);color:var(--info, #60a5fa);"
+                  onclick="editAdminFbInline(${af.id})">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button class="btn btn-danger" style="padding:4px 10px;font-size:.72rem;"
+                  onclick="deleteAdminFbInline(${af.id})">
+                  <i class="fas fa-trash"></i>
+                </button>` : "";
+          return `
+          <div class="feedback-card" style="background:${bg};border:1px solid ${border};border-left:4px solid ${color};position:relative;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-user-shield" style="color:${color};font-size:.75rem;"></i>
+                <h4 style="color:${color};font-size:.88rem;">${af.course_name} — from ${af.admin_name}</h4>
+                ${urgent ? '<span class="badge badge-danger" style="font-size:.65rem;"><i class="fas fa-exclamation-circle"></i> Urgent</span>' : ''}
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="meta">${timeAgo(af.created_at)}</span>
+                ${editBtns}
+              </div>
+            </div>
+            <p>${af.body}</p>
+          </div>
+          `;
+        }).join("");
+      }
+
+      el.innerHTML = html;
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll(".tab-btn").forEach(b => {
+        b.classList.toggle("active", b.dataset.tab === name);
+      });
+      document.querySelectorAll(".tab-panel").forEach(p => {
+        p.classList.toggle("active", p.id === `tab-${name}`);
+      });
+    }
+
+    // ── Wrap render helpers to keep row caches in sync ────────
+    const _origRenderGradeRows = renderGradeRows;
+    renderGradeRows = (rows) => { _gradeRows = rows; _origRenderGradeRows(rows); };
+    const _origRenderAttRows = renderAttRows;
+    renderAttRows = (rows) => { _attRows = rows; _origRenderAttRows(rows); };
+    let _adminFbRows = [];
+    const _origRenderFeedback = renderFeedback;
+    renderFeedback = (rows, adminRows) => { _fbRows = rows; _adminFbRows = adminRows || []; _origRenderFeedback(rows, adminRows); };
+
+    // ── Edit / Delete helpers (exposed to inline onclick) ─────
+    window.editGrade = (id) => {
+      const r = _gradeRows.find(g => g.id === id);
+      if (!r) return;
+      const gradeForm   = document.getElementById("gradeForm");
+      const addGradeBtn = document.getElementById("addGradeBtn");
+
+      document.getElementById("g_course").value    = r.course_name;
+      document.getElementById("g_course").readOnly = true;
+      document.getElementById("g_course").style.opacity = "0.6";
+      document.getElementById("g_grade").value     = r.grade;
+      document.getElementById("g_att").value       = r.att_score;
+      document.getElementById("g_att_max").value   = r.att_max;
+      document.getElementById("g_mid").value       = r.midterm_score;
+      document.getElementById("g_mid_max").value   = r.midterm_max;
+      document.getElementById("g_q1").value        = r.quiz1_score;
+      document.getElementById("g_q1_max").value    = r.quiz1_max;
+      document.getElementById("g_q2").value        = r.quiz2_score;
+      document.getElementById("g_q2_max").value    = r.quiz2_max;
+      document.getElementById("g_tlabel").value    = r.next_target_label || "";
+      document.getElementById("g_tneed").value     = r.next_target_need  || "";
+      document.getElementById("g_danger").checked  = !!r.is_danger;
+
+      gradeForm.classList.add("open");
+      addGradeBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Form';
+      gradeForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    window.deleteGrade = async (id) => {
+      if (!confirm("Delete this grade record?")) return;
+      try {
+        await DoctorAPI.deleteGrade(id);
+        toast("Grade deleted");
+        const updated = await DoctorAPI.getGrades(selectedId);
+        renderGradeRows(updated);
+      } catch(e) { toast(e.message, "err"); }
+    };
+
+    window.editAtt = (id) => {
+      const r = _attRows.find(a => a.id === id);
+      if (!r) return;
+      const attForm   = document.getElementById("attForm");
+      const addAttBtn = document.getElementById("addAttBtn");
+
+      document.getElementById("a_course").value         = r.course_name;
+      document.getElementById("a_course").readOnly      = true;
+      document.getElementById("a_course").style.opacity = "0.6";
+      document.getElementById("a_attended").value       = r.attended;
+      document.getElementById("a_total").value          = r.total;
+
+      attForm.classList.add("open");
+      addAttBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Form';
+      attForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    window.deleteAtt = async (id) => {
+      if (!confirm("Delete this attendance record?")) return;
+      try {
+        await DoctorAPI.deleteAttendance(id);
+        toast("Attendance record deleted");
+        const updated = await DoctorAPI.getAttendance(selectedId);
+        renderAttRows(updated);
+      } catch(e) { toast(e.message, "err"); }
+    };
+
+    window.editFb = (id) => {
+      const f = _fbRows.find(r => r.id === id);
+      if (!f) return;
+      _editingFbId = id;
+      const fbForm   = document.getElementById("fbForm");
+      const addFbBtn = document.getElementById("addFbBtn");
+
+      document.getElementById("f_course").value         = f.course_name;
+      document.getElementById("f_course").readOnly      = true;
+      document.getElementById("f_course").style.opacity = "0.6";
+      document.getElementById("f_body").value           = f.body;
+      document.getElementById("f_danger").checked       = !!f.is_danger;
+
+      fbForm.classList.add("open");
+      addFbBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Form';
+      fbForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    // ── Nav: view switching ────────────────────
+    function showView(view) {
+      const dashboard  = document.querySelector(".dashboard");
+      const scSection  = document.getElementById("scheduleSection");
+      document.getElementById("navItemDashboard").classList.toggle("active", view === "dashboard");
+      document.getElementById("navItemSchedule").classList.toggle("active", view === "schedule");
+      dashboard.style.display  = view === "dashboard" ? "" : "none";
+      scSection.style.display  = view === "schedule"  ? "block" : "none";
+      if (view === "schedule") initScheduleSection();
+    }
+    document.getElementById("navDashboardLink").addEventListener("click", e => { e.preventDefault(); showView("dashboard"); });
+    document.getElementById("navScheduleLink").addEventListener("click", e => { e.preventDefault(); showView("schedule"); });
+
+    // ── Top-level Schedule Section ────────────────────────────
+    let _scSectionRows = [];
+    let _scSectionEditId = null;
+    let _scSectionSemester = null;
+    let _scSectionInited = false;
+
+    function initScheduleSection() {
+      if (_scSectionInited) return;
+      _scSectionInited = true;
+
+      const sel = document.getElementById("scSemesterSel");
+
+      document.getElementById("scAddBtn").addEventListener("click", () => {
+        _scSectionEditId = null;
+        ["scs_course","scs_start","scs_end","scs_location","scs_doctor"].forEach(id => document.getElementById(id).value = "");
+        document.getElementById("scs_day").value  = "Sunday";
+        document.getElementById("scs_type").value = "Lecture";
+        const form = document.getElementById("scSectionForm");
+        form.classList.toggle("open");
+        document.getElementById("scAddBtn").innerHTML = form.classList.contains("open")
+          ? '<i class="fas fa-chevron-up"></i> Hide Form' : '<i class="fas fa-plus"></i> Add Entry';
+      });
+
+      document.getElementById("scsCancelBtn").addEventListener("click", () => {
+        document.getElementById("scSectionForm").classList.remove("open");
+        document.getElementById("scAddBtn").innerHTML = '<i class="fas fa-plus"></i> Add Entry';
+        _scSectionEditId = null;
+      });
+
+      document.getElementById("scsSaveBtn").addEventListener("click", async () => {
+        const data = {
+          course_name: document.getElementById("scs_course").value.trim(),
+          day:         document.getElementById("scs_day").value,
+          type:        document.getElementById("scs_type").value,
+          start_time:  document.getElementById("scs_start").value,
+          end_time:    document.getElementById("scs_end").value,
+          location:    document.getElementById("scs_location").value.trim(),
+          doctor_name: document.getElementById("scs_doctor").value.trim(),
+        };
+        if (!data.course_name) return toast("Course name is required", "err");
+        if (!data.start_time || !data.end_time) return toast("Start and end time are required", "err");
+        if (!_scSectionSemester) return toast("Select a semester first", "err");
+        try {
+          if (_scSectionEditId) {
+            await DoctorAPI.updateSchedule(_scSectionEditId, data);
+            toast("Schedule entry updated ✓");
+            _scSectionEditId = null;
+          } else {
+            await DoctorAPI.addSchedule(_scSectionSemester, data);
+            toast("Schedule entry added ✓");
+          }
+          document.getElementById("scSectionForm").classList.remove("open");
+          document.getElementById("scAddBtn").innerHTML = '<i class="fas fa-plus"></i> Add Entry';
+          const updated = await DoctorAPI.getSchedule(_scSectionSemester);
+          renderSectionScRows(updated);
+        } catch(e) { toast(e.message, "err"); }
+      });
+
+      sel.addEventListener("change", async () => {
+        _scSectionSemester = sel.value;
+        if (!_scSectionSemester) {
+          document.getElementById("scSectionTableWrap").style.display = "none";
+          document.getElementById("scSectionEmpty").style.display = "none";
+          document.getElementById("scAddBtn").style.display = "none";
+          return;
+        }
+        document.getElementById("scAddBtn").style.display = "";
+        document.getElementById("scSectionEmpty").style.display = "none";
+        document.getElementById("scSectionTableWrap").style.display = "block";
+        const rows = await DoctorAPI.getSchedule(_scSectionSemester);
+        renderSectionScRows(rows);
+      });
+
+      document.getElementById("scSectionEmpty").style.display = "block";
+    }
+
+    function renderSectionScRows(rows) {
+      _scSectionRows = rows;
+      const tbody = document.getElementById("scSectionTbody");
+      const typeColor = { Lecture: "badge-accent", Lab: "badge-success", Tutorial: "badge-warning" };
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">No schedule entries yet.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td style="font-weight:600;">${r.day}</td>
+          <td>${r.course_name}</td>
+          <td><span class="badge ${typeColor[r.type] || 'badge-accent'}">${r.type}</span></td>
+          <td style="font-size:.82rem;">${r.start_time} – ${r.end_time}</td>
+          <td style="color:var(--text-muted);font-size:.82rem;">${r.location || '—'}</td>
+          <td style="font-size:.82rem;">${r.doctor_name || '—'}</td>
+          <td style="display:flex;gap:6px;">
+            <button class="btn btn-ghost" style="padding:5px 10px;font-size:.75rem;border-color:rgba(var(--accent-rgb),.25);color:var(--accent);"
+              onclick="editSectionSc(${r.id})"><i class="fas fa-pen"></i></button>
+            <button class="btn btn-danger" style="padding:5px 10px;font-size:.75rem;"
+              onclick="deleteSectionSc(${r.id})"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    window.editSectionSc = (id) => {
+      const r = _scSectionRows.find(s => s.id === id);
+      if (!r) return;
+      _scSectionEditId = id;
+      document.getElementById("scs_course").value   = r.course_name;
+      document.getElementById("scs_day").value      = r.day;
+      document.getElementById("scs_type").value     = r.type;
+      document.getElementById("scs_start").value    = r.start_time;
+      document.getElementById("scs_end").value      = r.end_time;
+      document.getElementById("scs_location").value = r.location || "";
+      document.getElementById("scs_doctor").value   = r.doctor_name || "";
+      const form = document.getElementById("scSectionForm");
+      form.classList.add("open");
+      document.getElementById("scAddBtn").innerHTML = '<i class="fas fa-chevron-up"></i> Hide Form';
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    window.deleteSectionSc = async (id) => {
+      if (!confirm("Delete this schedule entry?")) return;
+      try {
+        await DoctorAPI.deleteSchedule(id);
+        toast("Schedule entry deleted");
+        const updated = await DoctorAPI.getSchedule(_scSectionSemester);
+        renderSectionScRows(updated);
+      } catch(e) { toast(e.message, "err"); }
+    };
+
+    window.deleteFb = async (id) => {
+      if (!confirm("Delete this feedback?")) return;
+      try {
+        await DoctorAPI.deleteFeedback(id);
+        toast("Feedback deleted");
+        const studentFb = await DoctorAPI.getFeedback(selectedId);
+        let adminFb = [];
+        try { adminFb = await DoctorAPI.getAdminFeedback(selectedId); } catch {}
+        renderFeedback(studentFb, adminFb);
+      } catch(e) { toast(e.message, "err"); }
+    };
+
+    // ── Admin feedback inline edit/delete (within student feedback tab) ──
+    window.editAdminFbInline = (id) => {
+      const af = _adminFbRows.find(r => r.id === id);
+      if (!af) return;
+      _editingAdminFbId = id;
+      _editingFbId = null;
+      const fbForm   = document.getElementById("fbForm");
+      const addFbBtn = document.getElementById("addFbBtn");
+
+      document.getElementById("f_course").value         = af.course_name;
+      document.getElementById("f_course").readOnly      = true;
+      document.getElementById("f_course").style.opacity = "0.6";
+      document.getElementById("f_body").value           = af.body;
+      document.getElementById("f_danger").checked       = !!af.is_urgent;
+      if (session.role === "admin") document.getElementById("f_sendto").value = "doctor";
+
+      fbForm.classList.add("open");
+      addFbBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Form';
+      fbForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    window.deleteAdminFbInline = async (id) => {
+      if (!confirm("Delete this admin feedback?")) return;
+      try {
+        await DoctorAPI.deleteAdminFeedback(id);
+        toast("Admin feedback deleted");
+        const studentFb = await DoctorAPI.getFeedback(selectedId);
+        let adminFb = [];
+        try { adminFb = await DoctorAPI.getAdminFeedback(selectedId); } catch {}
+        renderFeedback(studentFb, adminFb);
+      } catch(e) { toast(e.message, "err"); }
+    };
+  </script>
+</body>
+</html>
