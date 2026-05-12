@@ -1,14 +1,34 @@
 require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 const express = require("express");
+const cors    = require("cors");
 const path    = require("path");
+const { execSync } = require("child_process");
 
 const { createSchema } = require("./db/schema");
+const { getDb }        = require("./db/database");
 const authRoutes    = require("./routes/auth");
 const studentRoutes = require("./routes/student");
 const doctorRoutes  = require("./routes/doctor");
 const adminRoutes   = require("./routes/admin");
 
 createSchema();
+
+// Auto-seed if database is empty (first deploy)
+try {
+  const db = getDb();
+  const row = db.prepare("SELECT COUNT(*) as cnt FROM users").get();
+  if (row.cnt === 0) {
+    console.log("  Empty database detected — running seeds...");
+    const scriptsDir = path.join(__dirname, "scripts");
+    execSync(`node "${path.join(scriptsDir, "seed-doctor.js")}"`,  { stdio: "inherit" });
+    execSync(`node "${path.join(scriptsDir, "seed-students.js")}"`, { stdio: "inherit" });
+    execSync(`node "${path.join(scriptsDir, "seed-schedule.js")}"`, { stdio: "inherit" });
+    execSync(`node "${path.join(scriptsDir, "seed-staff.js")}"`,    { stdio: "inherit" });
+    console.log("  Seeding complete.\n");
+  }
+} catch (e) {
+  console.error("  Auto-seed warning:", e.message);
+}
 
 const app      = express();
 const PORT     = process.env.PORT || 3001;

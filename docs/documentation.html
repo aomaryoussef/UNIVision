@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UniVision — Project Documentation</title>
+<style>
+  @page { size: A4; margin: 25mm 20mm 25mm 20mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a1a2e; line-height: 1.7; font-size: 13px; }
+
+  /* Cover page */
+  .cover { page-break-after: always; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; text-align: center; background: linear-gradient(135deg, #091428 0%, #0f1f3d 50%, #1a2d5a 100%); color: #fff; padding: 60px; }
+  .cover h1 { font-size: 48px; font-weight: 800; color: #d4a830; margin-bottom: 10px; letter-spacing: 2px; }
+  .cover .subtitle { font-size: 20px; color: #a0aec0; margin-bottom: 40px; }
+  .cover .meta { font-size: 14px; color: #718096; line-height: 2; }
+  .cover .divider { width: 80px; height: 4px; background: #d4a830; border-radius: 2px; margin: 30px auto; }
+
+  /* TOC */
+  .toc { page-break-after: always; padding-top: 40px; }
+  .toc h2 { font-size: 28px; color: #091428; margin-bottom: 30px; border-bottom: 3px solid #d4a830; padding-bottom: 10px; }
+  .toc-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dotted #ccc; font-size: 14px; }
+  .toc-item span:first-child { font-weight: 600; }
+  .toc-item span:last-child { color: #d4a830; font-weight: 700; }
+
+  /* Sections */
+  .section { page-break-before: always; padding-top: 20px; }
+  .section:first-of-type { page-break-before: avoid; }
+  h2 { font-size: 26px; color: #091428; margin-bottom: 20px; border-bottom: 3px solid #d4a830; padding-bottom: 8px; }
+  h3 { font-size: 18px; color: #0f1f3d; margin: 24px 0 10px; }
+  h4 { font-size: 15px; color: #1a2d5a; margin: 16px 0 8px; }
+  p { margin-bottom: 12px; text-align: justify; }
+  ul, ol { margin: 8px 0 16px 24px; }
+  li { margin-bottom: 6px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 20px; font-size: 12.5px; }
+  th { background: #091428; color: #d4a830; padding: 10px 12px; text-align: left; font-weight: 700; }
+  td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) { background: #f7f9fc; }
+  tr:hover { background: #edf2f7; }
+
+  /* Feature cards */
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .feature-card { background: #f7f9fc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; border-left: 4px solid #d4a830; }
+  .feature-card h4 { margin: 0 0 6px; color: #091428; font-size: 14px; }
+  .feature-card p { font-size: 12px; margin: 0; color: #4a5568; }
+  .feature-card .why { font-size: 11px; color: #718096; margin-top: 6px; font-style: italic; }
+
+  /* Code blocks */
+  code { background: #edf2f7; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: 'Courier New', monospace; }
+  pre { background: #0f1f3d; color: #e2e8f0; padding: 16px; border-radius: 8px; font-size: 12px; overflow-x: auto; margin: 12px 0; font-family: 'Courier New', monospace; line-height: 1.5; }
+  pre code { background: transparent; padding: 0; }
+
+  /* Highlights */
+  .highlight-box { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #f59e0b; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
+  .highlight-box h4 { color: #92400e; margin: 0 0 6px; }
+  .highlight-box p { color: #78350f; margin: 0; font-size: 12.5px; }
+
+  .benefit-box { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 1px solid #10b981; border-radius: 10px; padding: 16px 20px; margin: 12px 0; }
+  .benefit-box h4 { color: #065f46; margin: 0 0 4px; font-size: 13px; }
+  .benefit-box p { color: #064e3b; margin: 0; font-size: 12px; }
+
+  /* Architecture diagram (text-based) */
+  .arch-box { background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 12px; padding: 24px; text-align: center; margin: 20px 0; }
+  .arch-box pre { background: transparent; color: #1e293b; text-align: left; }
+
+  /* Footer */
+  .page-footer { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 10px; color: #a0aec0; padding: 10px; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+  .badge-gold { background: #fef3c7; color: #92400e; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════ COVER ════════ -->
+<div class="cover">
+  <h1>UniVision</h1>
+  <p class="subtitle">University Student Portal System</p>
+  <div class="divider"></div>
+  <p class="meta">
+    Project Documentation<br>
+    Version 1.0<br><br>
+    Full-Stack Web Application<br>
+    Node.js &bull; Express &bull; SQLite &bull; Vanilla JS<br><br>
+    May 2026
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════ TOC ══════════ -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <div class="toc-item"><span>1. Project Overview</span><span>3</span></div>
+  <div class="toc-item"><span>2. Problem Statement & Motivation</span><span>4</span></div>
+  <div class="toc-item"><span>3. Technology Stack & Justification</span><span>5</span></div>
+  <div class="toc-item"><span>4. System Architecture</span><span>7</span></div>
+  <div class="toc-item"><span>5. Features — Student Portal</span><span>8</span></div>
+  <div class="toc-item"><span>6. Features — Doctor/Admin Dashboard</span><span>12</span></div>
+  <div class="toc-item"><span>7. Theme & Customization System</span><span>14</span></div>
+  <div class="toc-item"><span>8. Smart Performance Alert System</span><span>15</span></div>
+  <div class="toc-item"><span>9. Performance Comparison Engine</span><span>16</span></div>
+  <div class="toc-item"><span>10. Database Design</span><span>17</span></div>
+  <div class="toc-item"><span>11. API Reference</span><span>18</span></div>
+  <div class="toc-item"><span>12. Security & Authentication</span><span>19</span></div>
+  <div class="toc-item"><span>13. Project Structure</span><span>20</span></div>
+  <div class="toc-item"><span>14. Setup & Deployment Guide</span><span>21</span></div>
+  <div class="toc-item"><span>15. Future Enhancements</span><span>22</span></div>
+</div>
+
+<!-- ════════════════════════════════════════════ 1. OVERVIEW ═════ -->
+<div class="section">
+  <h2>1. Project Overview</h2>
+  <p>
+    <strong>UniVision</strong> is a comprehensive university student portal system designed to streamline academic management for three user roles: <strong>Students</strong>, <strong>Doctors (Professors)</strong>, and <strong>Administrators</strong>. The system provides a centralized platform for tracking grades, attendance, schedules, performance analytics, and inter-role communication through a feedback system.
+  </p>
+  <p>
+    The project is a <strong>full-stack web application</strong> built with vanilla HTML/CSS/JavaScript on the frontend and Node.js + Express + SQLite on the backend.
+  </p>
+
+  <div class="highlight-box">
+    <h4>Key Statistics</h4>
+    <p>20 seeded students &bull; 63 courses &bull; 4 grade levels &bull; 12 database tables &bull; 30+ API endpoints &bull; 8 visual themes &bull; 6 smart alert triggers &bull; 10 web pages</p>
+  </div>
+
+  <h3>Project Goals</h3>
+  <ol>
+    <li><strong>Centralize</strong> academic data (grades, attendance, schedules) in one accessible platform</li>
+    <li><strong>Empower</strong> students with self-service tools to monitor their academic progress</li>
+    <li><strong>Enable</strong> doctors and admins to manage student records efficiently with inline editing</li>
+    <li><strong>Provide</strong> actionable insights through performance comparison and smart alerts</li>
+    <li><strong>Facilitate</strong> communication between roles through a contextual feedback system</li>
+    <li><strong>Offer</strong> a modern, responsive, and visually appealing interface with theme customization</li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════ 2. PROBLEM STATEMENT ═ -->
+<div class="section">
+  <h2>2. Problem Statement & Motivation</h2>
+
+  <h3>The Problem</h3>
+  <p>
+    In many university environments, academic information is scattered across multiple disconnected systems. Students must navigate different platforms to check grades, view attendance records, access schedules, and communicate with faculty. This fragmentation leads to:
+  </p>
+  <ul>
+    <li><strong>Delayed awareness</strong> — Students often discover poor performance too late to take corrective action</li>
+    <li><strong>Communication gaps</strong> — No structured channel for faculty to send targeted feedback to individual students</li>
+    <li><strong>Manual processes</strong> — Doctors and admins rely on spreadsheets and emails for record management</li>
+    <li><strong>No comparative insight</strong> — Students cannot benchmark their performance against peers</li>
+    <li><strong>Accessibility barriers</strong> — Fragmented systems make it harder for students to access information quickly</li>
+  </ul>
+
+  <h3>Our Solution</h3>
+  <p>
+    UniVision addresses these challenges by providing a <strong>unified, role-based portal</strong> with real-time analytics, proactive alerts, and cross-platform access. Every feature was designed with a specific problem in mind:
+  </p>
+
+  <div class="benefit-box">
+    <h4>Why UniVision Matters</h4>
+    <p>Rather than building yet another grade viewer, UniVision focuses on <em>actionable intelligence</em> — telling students not just what their grades are, but how they compare, where they're falling behind, and what they need to achieve next. The smart alert system proactively identifies at-risk students before it's too late.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 3. TECH STACK ════════ -->
+<div class="section">
+  <h2>3. Technology Stack & Justification</h2>
+
+  <p>Every technology choice in UniVision was deliberate, balancing simplicity, performance, and educational value.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Technology</th>
+        <th>Version</th>
+        <th>Why We Chose It</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Frontend</strong></td>
+        <td>HTML5, CSS3, Vanilla JavaScript</td>
+        <td>ES2022+</td>
+        <td>No build tools needed. Demonstrates core web fundamentals without framework abstraction. Faster initial load, zero dependency bloat.</td>
+      </tr>
+      <tr>
+        <td><strong>Backend</strong></td>
+        <td>Node.js + Express</td>
+        <td>Node 22+</td>
+        <td>JavaScript full-stack consistency. Express is minimal, well-documented, and ideal for REST APIs. Node 22 provides native SQLite support.</td>
+      </tr>
+      <tr>
+        <td><strong>Database</strong></td>
+        <td>SQLite (via <code>node:sqlite</code>)</td>
+        <td>Built-in</td>
+        <td>Zero-configuration, file-based database. No separate database server required. Perfect for educational projects and single-server deployments.</td>
+      </tr>
+      <tr>
+        <td><strong>Authentication</strong></td>
+        <td>JWT (<code>jsonwebtoken</code>)</td>
+        <td>9.x</td>
+        <td>Stateless authentication. No session storage needed on the server. Tokens carry role and identity, enabling role-based access control.</td>
+      </tr>
+      <tr>
+        <td><strong>Password Hashing</strong></td>
+        <td><code>bcryptjs</code></td>
+        <td>2.x</td>
+        <td>Industry-standard password hashing with salt rounds. Pure JavaScript implementation (no native compilation required).</td>
+      </tr>
+      <tr>
+        <td><strong>Charts</strong></td>
+        <td>Chart.js</td>
+        <td>4.x (CDN)</td>
+        <td>Lightweight, responsive charting library. Supports line, doughnut, bar, and radar charts needed for GPA trends and attendance analytics.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Why Vanilla JavaScript (No React/Vue/Angular)?</h3>
+  <p>
+    We deliberately chose vanilla JavaScript over frameworks for several reasons:
+  </p>
+  <ul>
+    <li><strong>Educational transparency</strong> — Every line of code is visible and understandable without framework-specific abstractions</li>
+    <li><strong>Zero build step</strong> — No Webpack, Vite, or bundler configuration. Open the HTML file and it works.</li>
+    <li><strong>Performance</strong> — No framework runtime overhead. The entire frontend is under 50KB of JavaScript.</li>
+    <li><strong>Portability</strong> — Can be deployed on any static file server without a build pipeline.</li>
+  </ul>
+
+  <h3>Why SQLite (No MySQL/PostgreSQL)?</h3>
+  <p>
+    SQLite was chosen because it eliminates the need for a separate database server installation. The entire database lives in a single file (<code>server/db/univision.db</code>), making the project trivially portable — clone the repo, run <code>npm install</code>, and you have a working system. For a university portal serving hundreds of students, SQLite's performance is more than sufficient.
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════ 4. ARCHITECTURE ══════ -->
+<div class="section">
+  <h2>4. System Architecture</h2>
+
+  <h3>High-Level Architecture</h3>
+  <div class="arch-box">
+    <pre><code>
+┌──────────────────────────────────────────────────────────────────┐
+│                        CLIENT LAYER                              │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                    Web Browser                            │   │
+│  │                    (HTML / CSS / JS)                       │   │
+│  │                                                           │   │
+│  │  • student-api.js    • doctor-api.js    • theme.js        │   │
+│  └──────────────────────────┬────────────────────────────────┘   │
+│                             │  HTTP / JSON                       │
+└─────────────────────────────┼────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                        SERVER LAYER                              │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐    │
+│  │                    Express.js (Node.js)                   │    │
+│  │                                                           │    │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │    │
+│  │  │ auth.js  │  │student.js│  │ doctor.js│  │ admin.js │ │    │
+│  │  │ (login)  │  │ (7 GET)  │  │(20 CRUD) │  │ (1 POST) │ │    │
+│  │  └──────────┘  └──────────┘  └──────────┘  └──────────┘ │    │
+│  │                                                           │    │
+│  │  ┌──────────────────────────────────────────────────────┐ │    │
+│  │  │  Middleware: JWT Auth + Role Guards + CORS            │ │    │
+│  │  └──────────────────────────────────────────────────────┘ │    │
+│  └──────────────────────────┬────────────────────────────────┘    │
+│                             │                                     │
+│                             ▼                                     │
+│  ┌──────────────────────────────────────────────────────────┐    │
+│  │              SQLite Database (univision.db)               │    │
+│  │              12 Tables • File-based • Zero Config         │    │
+│  └──────────────────────────────────────────────────────────┘    │
+└──────────────────────────────────────────────────────────────────┘
+    </code></pre>
+  </div>
+
+  <h3>Request Flow</h3>
+  <ol>
+    <li>User interacts with the Web client</li>
+    <li>Client sends HTTP request with JWT token in the <code>Authorization</code> header</li>
+    <li>Express middleware validates the token and checks the user's role</li>
+    <li>Route handler queries SQLite and computes derived data (GPA, percentiles, alerts)</li>
+    <li>JSON response is returned to the client</li>
+    <li>Client renders the data with animations and interactive charts</li>
+  </ol>
+
+  <h3>Design Principles</h3>
+  <ul>
+    <li><strong>Separation of Concerns</strong> — Client, server, and database layers are fully decoupled</li>
+    <li><strong>REST API</strong> — All data access goes through a clean REST API, enabling multiple client types</li>
+    <li><strong>Role-Based Access</strong> — Every endpoint enforces role checks (student, doctor, admin)</li>
+    <li><strong>Computed on Server</strong> — GPA calculations, percentiles, alerts, and comparisons are computed server-side to ensure consistency</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════ 5. STUDENT FEATURES ══ -->
+<div class="section">
+  <h2>5. Features — Student Portal</h2>
+
+  <p>The student portal provides 7 dedicated pages, each designed to address a specific academic need. Below is a detailed breakdown of each feature, its purpose, and its benefits.</p>
+
+  <h3>5.1 Home Dashboard</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Cumulative GPA Display</h4>
+      <p>Shows the student's overall GPA prominently with a stat card and animated counter.</p>
+      <p class="why">Why: Immediate visibility of academic standing without navigating to grades.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Attendance Overview</h4>
+      <p>Displays overall attendance percentage and classes attended/total count.</p>
+      <p class="why">Why: Attendance affects grades in many programs; students need to track it proactively.</p>
+    </div>
+    <div class="feature-card">
+      <h4>GPA Progress Chart</h4>
+      <p>Interactive line chart (Chart.js) showing GPA trend across semesters.</p>
+      <p class="why">Why: Visualizing trends helps students understand if they're improving or declining over time.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Attendance Doughnut Chart</h4>
+      <p>Visual breakdown of attended vs. absent classes in a doughnut chart.</p>
+      <p class="why">Why: A visual representation is more impactful than raw numbers for behavioral change.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Top Achievers Leaderboard</h4>
+      <p>Ranked list of top-performing students in the same grade, with gold/silver/bronze medals. Highlights the current student if they're in the top ranks.</p>
+      <p class="why">Why: Positive competition motivates students. Seeing peers perform well creates aspirational goals.</p>
+    </div>
+    <div class="feature-card">
+      <h4>GPA History Bars</h4>
+      <p>Animated progress bars showing GPA for each completed semester with staggered CSS animations.</p>
+      <p class="why">Why: Quick visual scan of semester-by-semester performance without opening detailed reports.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Smart Performance Alerts</h4>
+      <p>Dismissible warning/danger banners triggered by 6 automated conditions (see Section 8).</p>
+      <p class="why">Why: Proactive intervention — alert students to problems before they escalate.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Quick Access Cards</h4>
+      <p>Navigation cards linking to Grades, Attendance, Reports, and Profile pages.</p>
+      <p class="why">Why: Reduces navigation friction for the most common student tasks.</p>
+    </div>
+  </div>
+
+  <h3>5.2 Grades Page</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Current GPA Banner</h4>
+      <p>Large, prominent display of the current semester GPA.</p>
+      <p class="why">Why: The most important metric should be the most visible.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Per-Course Grade Cards</h4>
+      <p>Each course shows: letter grade, breakdown (attendance, midterm, quiz1, quiz2), pre-final score with animated progress bar, and danger highlighting for at-risk courses.</p>
+      <p class="why">Why: Students need granular visibility into what's contributing to their grade, not just the final letter.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Next Target System</h4>
+      <p>Shows what score the student needs on the final exam to achieve the next grade tier (e.g., "Target for A+: 36/40 in Final").</p>
+      <p class="why">Why: Transforms vague anxiety into concrete, actionable goals. Students know exactly what to aim for.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Course Staff Contacts</h4>
+      <p>Each course card shows the assigned doctor and assistant with clickable email links.</p>
+      <p class="why">Why: Eliminates the need to look up faculty contacts separately when a student needs help.</p>
+    </div>
+  </div>
+
+  <div class="benefit-box">
+    <h4>Doctor Feedback Section</h4>
+    <p>Below the grade cards, students see feedback messages from their doctors — organized by course, with timestamps and danger flags for urgent messages. This creates a direct communication channel from faculty to individual students.</p>
+  </div>
+
+  <h3>5.3 Attendance Page</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Overall Attendance Card</h4>
+      <p>Large percentage display with color-coded status (green &ge;75%, yellow &ge;60%, red &lt;60%) and animated progress bar.</p>
+      <p class="why">Why: Attendance thresholds have real consequences (course failure). Color-coding creates urgency.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Per-Course Attendance</h4>
+      <p>Individual cards per course showing percentage, attended/total count, status badge, and optional info message.</p>
+      <p class="why">Why: A student may have good overall attendance but critically low attendance in one specific course.</p>
+    </div>
+  </div>
+
+  <h3>5.4 Schedule Page</h3>
+  <p>
+    Displays the class schedule grouped by day (Sunday through Thursday), with each slot showing start/end time, course name, location, doctor name, and type badge (Lecture/Lab/Tutorial) with color-coding.
+  </p>
+  <div class="highlight-box">
+    <h4>Design Decision: Shared Schedules</h4>
+    <p>Schedules are shared per semester and grade level, not duplicated per student. This reflects the reality that all students in the same grade take the same core courses. It also simplifies administration — doctors update the schedule once and all students in that grade see it.</p>
+  </div>
+
+  <h3>5.5 Reports Page</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Semester Selector</h4>
+      <p>Dropdown listing all completed semesters with GPA preview badge.</p>
+      <p class="why">Why: Quick access to any past semester without navigating multiple pages.</p>
+    </div>
+    <div class="feature-card">
+      <h4>PDF/Print Generation</h4>
+      <p>One-click "Generate PDF / Print" button that renders a formal academic transcript with university header, student info strip, course table, and footer — using the browser's native print dialog.</p>
+      <p class="why">Why: Students frequently need physical or digital copies of transcripts for applications, scholarships, and records.</p>
+    </div>
+  </div>
+
+  <h3>5.6 Profile Page</h3>
+  <p>
+    Displays the student's complete profile: avatar, English and Arabic names, student ID, grade level with descriptive label (e.g., "Third Year — Junior"), university email, and a detailed information grid covering 12 fields (National ID, DOB, birthplace, nationality, gender, religion, phone, email, address, etc.).
+  </p>
+  <p class="why" style="font-style:italic; color:#718096;">
+    Why: A single authoritative source for personal information. Students can verify that their records are correct without visiting the registrar's office.
+  </p>
+
+  <h3>5.7 Performance Comparison Page</h3>
+  <p>See Section 9 for detailed coverage of this advanced analytics feature.</p>
+</div>
+
+<!-- ═══════════════════════════════════════ 6. DOCTOR FEATURES ═══ -->
+<div class="section">
+  <h2>6. Features — Doctor/Admin Dashboard</h2>
+
+  <p>The doctor and admin dashboard provides comprehensive student management capabilities through a two-panel layout: a searchable student sidebar and a tabbed detail area.</p>
+
+  <h3>6.1 Student Management</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Student Search & Filter</h4>
+      <p>Real-time search by name or ID, with grade filter pills (All, Grade 1–4).</p>
+      <p class="why">Why: With 20+ students, finding a specific student quickly is essential for efficient classroom management.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Student Overview</h4>
+      <p>Selecting a student shows their name, ID, email, GPA, attendance percentage, and course count.</p>
+      <p class="why">Why: Doctors need a quick snapshot before diving into detailed records.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Add Student (Admin Only)</h4>
+      <p>Modal form to create new student records with all required fields.</p>
+      <p class="why">Why: Admins need to onboard new students without direct database access.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Semester History</h4>
+      <p>Dropdown to view any past semester's courses, GPA, credits, and attendance.</p>
+      <p class="why">Why: Doctors reviewing a student need historical context, not just current grades.</p>
+    </div>
+  </div>
+
+  <h3>6.2 Grades Management (Tab 1)</h3>
+  <p>
+    A collapsible form allows doctors to add or update grades with full breakdown fields (course, letter grade, attendance, midterm, quiz 1, quiz 2 scores with maximums, next target, and danger flag). An inline table shows all existing grades with edit and delete actions. The server auto-computes pre-final totals.
+  </p>
+
+  <h3>6.3 Attendance Management (Tab 2)</h3>
+  <p>
+    Similar CRUD interface for attendance records. Doctors enter course name, lectures attended, and total lectures. The server auto-calculates percentage, status (Safe/Warning/Danger), and generates contextual warning messages.
+  </p>
+
+  <h3>6.4 Feedback System (Tab 3)</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Student Feedback</h4>
+      <p>Doctors send feedback to specific students about specific courses. Supports danger/urgent flagging.</p>
+      <p class="why">Why: Targeted, documented communication replaces informal hallway conversations that students may forget.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Admin-to-Doctor Feedback</h4>
+      <p>Admins can send private feedback to doctors in the context of a specific student. These appear in blue-styled cards, visible only to doctors and admins — never to students.</p>
+      <p class="why">Why: Admins need to give guidance to doctors about specific students (e.g., "student has a medical exemption") without the student seeing it.</p>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h4>Design Decision: Contextual Feedback</h4>
+    <p>All feedback (both to students and to doctors) is contextual — it lives within a specific student's feedback tab, not in a separate messaging system. This ensures feedback is always connected to the student it concerns, making it easier to find and review.</p>
+  </div>
+
+  <h3>6.5 Schedule Management</h3>
+  <p>
+    A separate top-level view for managing class schedules. Doctors select a semester/grade combination (8 options: Grade 1–4 × 2 semesters) and can add, edit, or delete schedule entries with fields for course, day, type, time, location, and doctor name.
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════ 7. THEME SYSTEM ══════ -->
+<div class="section">
+  <h2>7. Theme & Customization System</h2>
+
+  <p>UniVision includes a sophisticated theme system with 8 built-in themes, allowing users to personalize their experience.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Theme</th>
+        <th>Type</th>
+        <th>Primary BG</th>
+        <th>Accent Color</th>
+        <th>Best For</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Navy Gold</td><td><span class="badge badge-gold">Dark</span></td><td>#091428</td><td>#d4a830 (Gold)</td><td>Default — elegant and professional</td></tr>
+      <tr><td>Ocean Blue</td><td><span class="badge badge-gold">Dark</span></td><td>#0a1628</td><td>#38bdf8 (Sky Blue)</td><td>Modern, tech-focused feel</td></tr>
+      <tr><td>Emerald</td><td><span class="badge badge-gold">Dark</span></td><td>#071a12</td><td>#34d399 (Green)</td><td>Nature-inspired, calming</td></tr>
+      <tr><td>Royal Purple</td><td><span class="badge badge-gold">Dark</span></td><td>#110a28</td><td>#a78bfa (Purple)</td><td>Creative, distinctive</td></tr>
+      <tr><td>Rose</td><td><span class="badge badge-gold">Dark</span></td><td>#1a0a14</td><td>#fb7185 (Pink)</td><td>Warm, approachable</td></tr>
+      <tr><td>White</td><td><span class="badge badge-blue">Light</span></td><td>#ffffff</td><td>#1a56db (Blue)</td><td>Clean, minimal, high readability</td></tr>
+      <tr><td>Off-White</td><td><span class="badge badge-blue">Light</span></td><td>#f8f6f1</td><td>#b8860b (Dark Gold)</td><td>Warm paper-like feel, easy on eyes</td></tr>
+      <tr><td>White Grey</td><td><span class="badge badge-blue">Light</span></td><td>#f1f5f9</td><td>#475569 (Slate)</td><td>Professional, neutral</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Technical Implementation</h3>
+  <ul>
+    <li><strong>CSS Custom Properties</strong> — All colors are defined as CSS variables on <code>:root</code>. Theme switching overrides these variables dynamically.</li>
+    <li><strong><code>--accent-rgb</code> variable</strong> — Enables <code>rgba(var(--accent-rgb), 0.1)</code> patterns for transparent accent colors.</li>
+    <li><strong>IIFE pattern</strong> — <code>theme.js</code> runs as a self-executing function, not a module, ensuring it applies <em>before</em> the DOM renders to prevent theme flash.</li>
+    <li><strong>LocalStorage persistence</strong> — Selected theme survives page reloads and browser restarts.</li>
+    <li><strong>Light mode CSS overrides</strong> — <code>html.light-theme</code> class triggers 20+ CSS overrides for scrollbars, inputs, tables, buttons, and card backgrounds.</li>
+    <li><strong>Dynamic dropdown injection</strong> — The theme picker is injected into the navbar via JavaScript, requiring no HTML changes on individual pages.</li>
+  </ul>
+
+  <div class="benefit-box">
+    <h4>Why Theme Customization?</h4>
+    <p>Studies show that personalization increases user engagement by 20-30%. Dark themes reduce eye strain during evening study sessions, while light themes improve readability in bright environments. Offering both ensures the portal is comfortable for all users in all conditions.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 8. ALERTS ════════════ -->
+<div class="section">
+  <h2>8. Smart Performance Alert System</h2>
+
+  <p>The alert system automatically detects academic risk factors and displays actionable warnings on the student's home dashboard. Alerts are computed server-side with every dashboard load to ensure real-time accuracy.</p>
+
+  <h3>Alert Triggers</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Trigger</th>
+        <th>Condition</th>
+        <th>Severity</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>GPA Drop</td>
+        <td>Current semester GPA dropped &gt;0.5 from previous</td>
+        <td><span class="badge badge-gold">Warning</span></td>
+        <td>Early warning of academic decline trend</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Low GPA</td>
+        <td>Cumulative GPA below 2.0</td>
+        <td><span style="background:#fee2e2;color:#991b1b;display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;">Danger</span></td>
+        <td>Academic probation risk — immediate attention needed</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Low Overall Attendance</td>
+        <td>Overall attendance below 75%</td>
+        <td><span style="background:#fee2e2;color:#991b1b;display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;">Danger</span></td>
+        <td>Risk of course failure due to attendance policy</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Per-Course Attendance</td>
+        <td>Any single course attendance below 60%</td>
+        <td><span class="badge badge-gold">Warning</span></td>
+        <td>Course-specific intervention before it's too late</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Doctor-Flagged</td>
+        <td>Any course marked as "at-risk" by the doctor</td>
+        <td><span style="background:#fee2e2;color:#991b1b;display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;">Danger</span></td>
+        <td>Direct faculty intervention signal</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>Below Class Average</td>
+        <td>Student GPA is below the grade-level average</td>
+        <td><span class="badge badge-gold">Warning</span></td>
+        <td>Peer comparison to motivate improvement</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="benefit-box">
+    <h4>Why Smart Alerts?</h4>
+    <p>Traditional portals show data passively. UniVision's alert system acts as a <em>virtual academic advisor</em>, proactively identifying problems. A student who logs in and sees "Your attendance in Data Structures is at 55%" is far more likely to take action than one who has to manually calculate it from raw numbers.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 9. COMPARISON ════════ -->
+<div class="section">
+  <h2>9. Performance Comparison Engine</h2>
+
+  <p>The Performance Comparison page provides deep analytics comparing the student's performance against their classmates (same grade level).</p>
+
+  <h3>Components</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Overview Statistics</h4>
+      <p>Four stat cards: Your GPA (vs class average), GPA Rank, Percentile, Attendance (vs class average + rank).</p>
+      <p class="why">Why: Quick numerical context — am I above or below average?</p>
+    </div>
+    <div class="feature-card">
+      <h4>GPA Trend Chart</h4>
+      <p>Dual-line chart showing "Your GPA" vs "Class Average" across semesters.</p>
+      <p class="why">Why: Shows whether the student is converging with or diverging from the class average over time.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Course Performance Radar</h4>
+      <p>Radar chart comparing the student's scores vs class average across all courses.</p>
+      <p class="why">Why: Instantly reveals which courses the student is strong or weak in relative to peers.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Course-by-Course Breakdown</h4>
+      <p>For each course: horizontal bars comparing You / Class Avg / Class Top, with diff badge and component breakdown (Attendance, Midterm, Quiz 1, Quiz 2).</p>
+      <p class="why">Why: Pinpoints exactly where the student is falling behind — is it attendance? quizzes? midterms?</p>
+    </div>
+    <div class="feature-card">
+      <h4>Grade Distribution</h4>
+      <p>Bar charts per course showing how many students got each letter grade, with the current student's grade highlighted.</p>
+      <p class="why">Why: Shows if the student's grade is normal for that course or an outlier.</p>
+    </div>
+  </div>
+
+  <h3>Server-Side Computation</h3>
+  <p>
+    All comparison data is computed server-side in the <code>GET /student/:id/comparison</code> endpoint. This includes:
+  </p>
+  <ul>
+    <li>Rank and percentile calculation across all students in the same grade</li>
+    <li>Per-course averages, maximums, and rankings</li>
+    <li>Component-level breakdown (attendance, midterm, quiz scores) with class averages</li>
+    <li>Grade distribution frequency counts per course</li>
+    <li>GPA trend with class average per semester</li>
+  </ul>
+
+  <div class="highlight-box">
+    <h4>Privacy Consideration</h4>
+    <p>Students see aggregated statistics (averages, ranks, distributions) but never see other students' individual data. The leaderboard on the home page shows names only for top achievers, which is a common and accepted practice in academic settings.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 10. DATABASE ═════════ -->
+<div class="section">
+  <h2>10. Database Design</h2>
+
+  <p>UniVision uses SQLite with 12 tables designed for normalized, efficient data storage.</p>
+
+  <table>
+    <thead>
+      <tr><th>Table</th><th>Purpose</th><th>Key Columns</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>users</code></td><td>Authentication for all roles</td><td>id, password_hash, role, name</td></tr>
+      <tr><td><code>student_profiles</code></td><td>Extended student information</td><td>student_id, name_en, name_ar, national_id, dob, grade, email, phone, address</td></tr>
+      <tr><td><code>grades</code></td><td>Per-course grade records</td><td>student_id, course_name, grade, att/mid/quiz scores, is_danger</td></tr>
+      <tr><td><code>attendance</code></td><td>Per-course attendance records</td><td>student_id, course_name, attended, total</td></tr>
+      <tr><td><code>feedback</code></td><td>Doctor-to-student feedback</td><td>student_id, doctor_id, course_name, body, is_danger</td></tr>
+      <tr><td><code>admin_feedback</code></td><td>Admin-to-doctor private feedback</td><td>student_id, doctor_id, course_name, body, is_urgent</td></tr>
+      <tr><td><code>schedule</code></td><td>Class schedules per grade/semester</td><td>semester, course_name, day, start/end_time, location, type</td></tr>
+      <tr><td><code>semester_courses</code></td><td>Historical course records</td><td>student_id, semester_number, course_name, credits, grade</td></tr>
+      <tr><td><code>semesters</code></td><td>Semester summary records</td><td>student_id, semester_number, label, gpa, attendance_pct</td></tr>
+      <tr><td><code>course_staff</code></td><td>Doctor/assistant assignments</td><td>course_name, doctor_name, doctor_email, assistant_name</td></tr>
+      <tr><td><code>courses</code></td><td>Course catalog</td><td>name, credits, grade_level</td></tr>
+      <tr><td><code>doctors</code></td><td>Doctor profile information</td><td>user_id, name, department</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════ 11. API REFERENCE ════ -->
+<div class="section">
+  <h2>11. API Reference</h2>
+
+  <h3>Authentication</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>Body</th><th>Response</th></tr></thead>
+    <tbody>
+      <tr><td>POST</td><td><code>/api/auth/login</code></td><td><code>{role, id, password}</code></td><td><code>{token, user}</code></td></tr>
+      <tr><td>POST</td><td><code>/api/auth/logout</code></td><td>—</td><td><code>{ok: true}</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Student Endpoints (7 routes)</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>Returns</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td><code>/api/student/:id/home</code></td><td>GPA, attendance, history, top students, alerts</td></tr>
+      <tr><td>GET</td><td><code>/api/student/:id/profile</code></td><td>Full student profile</td></tr>
+      <tr><td>GET</td><td><code>/api/student/:id/grades</code></td><td>Courses with breakdown, feedback</td></tr>
+      <tr><td>GET</td><td><code>/api/student/:id/attendance</code></td><td>Overall + per-course attendance</td></tr>
+      <tr><td>GET</td><td><code>/api/student/:id/reports</code></td><td>Semester list</td></tr>
+      <tr><td>GET</td><td><code>/api/student/:id/reports/:sem</code></td><td>Semester detail with courses</td></tr>
+      <tr><td>GET</td><td><code>/api/student/:id/schedule</code></td><td>Schedule entries</td></tr>
+      <tr><td>GET</td><td><code>/api/student/:id/comparison</code></td><td>Rank, percentile, course breakdown, distributions</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Doctor/Admin Endpoints (20+ routes)</h3>
+  <table>
+    <thead><tr><th>Resource</th><th>Operations</th><th>Access</th></tr></thead>
+    <tbody>
+      <tr><td>Students</td><td>List, Get Detail, Get Semesters</td><td>Doctor + Admin</td></tr>
+      <tr><td>Grades</td><td>List, Create/Update, Delete</td><td>Doctor + Admin</td></tr>
+      <tr><td>Attendance</td><td>List, Create/Update, Delete</td><td>Doctor + Admin</td></tr>
+      <tr><td>Feedback</td><td>List, Create, Update, Delete</td><td>Doctor + Admin</td></tr>
+      <tr><td>Admin Feedback</td><td>List, Create, Update, Delete</td><td>Admin only (write), Doctor (read own)</td></tr>
+      <tr><td>Schedule</td><td>List, Create, Update, Delete</td><td>Doctor + Admin</td></tr>
+      <tr><td>Add Student</td><td>Create</td><td>Admin only</td></tr>
+    </tbody>
+  </table>
+
+  <p>All endpoints (except login) require a JWT token in the <code>Authorization: Bearer &lt;token&gt;</code> header. Role-based middleware enforces access control.</p>
+</div>
+
+<!-- ═══════════════════════════════════════ 12. SECURITY ═════════ -->
+<div class="section">
+  <h2>12. Security & Authentication</h2>
+
+  <h3>Authentication Flow</h3>
+  <ol>
+    <li>User submits role, ID, and password via the login form</li>
+    <li>Server verifies credentials against <code>bcryptjs</code>-hashed passwords in the <code>users</code> table</li>
+    <li>On success, server generates a JWT token (8-hour expiry) containing <code>{id, role, name}</code></li>
+    <li>Token is stored in <code>localStorage</code></li>
+    <li>A <code>uv_role</code> cookie is set for server-side page guards (web only)</li>
+    <li>Every API request includes the token in the <code>Authorization</code> header</li>
+  </ol>
+
+  <h3>Security Measures</h3>
+  <table>
+    <thead><tr><th>Measure</th><th>Implementation</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Password Hashing</td><td><code>bcryptjs</code> with salt rounds</td><td>Passwords never stored in plain text</td></tr>
+      <tr><td>JWT Tokens</td><td>8-hour expiry, server-side secret</td><td>Stateless auth, automatic session expiry</td></tr>
+      <tr><td>Role Guards (API)</td><td><code>requireAuth</code> + role check middleware</td><td>Students can't access doctor routes and vice versa</td></tr>
+      <tr><td>Self-Access Guard</td><td><code>requireSelf</code> middleware on student routes</td><td>Student A can't view Student B's data</td></tr>
+      <tr><td>Page Guards (Web)</td><td>Cookie-based route protection</td><td>Prevents unauthenticated access to protected pages</td></tr>
+      <tr><td>CORS</td><td><code>cors()</code> middleware</td><td>Allows cross-origin requests from web clients</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════ 13. STRUCTURE ════════ -->
+<div class="section">
+  <h2>13. Project Structure</h2>
+
+  <pre><code>rown/
+├── client/                      # Frontend (Web)
+│   ├── assets/                  # Logo, images
+│   ├── css/
+│   │   └── style.css            # Global design system (445+ lines)
+│   ├── js/
+│   │   ├── student-api.js       # Student API client (ES module)
+│   │   ├── doctor-api.js        # Doctor/Admin API client (ES module)
+│   │   └── theme.js             # Theme switcher (IIFE, 8 themes)
+│   ├── pages/
+│   │   ├── student/             # 7 student HTML pages
+│   │   └── doctor/              # Doctor/Admin dashboard
+│   ├── landing.html             # Public marketing page
+│   └── login.html               # Login page
+├── server/                      # Backend
+│   ├── app.js                   # Express entry point (97 lines)
+│   ├── .env                     # Environment variables (JWT_SECRET, PORT)
+│   ├── db/
+│   │   ├── database.js          # SQLite connection
+│   │   ├── schema.js            # 12 table definitions
+│   │   ├── seed.js              # Base seed data
+│   │   └── univision.db         # Database file
+│   ├── middleware/
+│   │   └── auth.js              # JWT verification + role guards
+│   ├── routes/
+│   │   ├── auth.js              # Login/logout endpoints
+│   │   ├── student.js           # Student API (8 GET routes)
+│   │   ├── doctor.js            # Doctor API (20+ CRUD routes)
+│   │   └── admin.js             # Admin API (1 POST route)
+│   └── scripts/                 # Database seed scripts
+│       ├── seed-doctor.js       # Seed doctor/admin users
+│       ├── seed-students.js     # Seed 20 students across 4 grades
+│       ├── seed-schedule.js     # Seed class schedules
+│       └── seed-staff.js        # Seed course staff assignments
+├── docs/
+│   └── UniVision_Presentation.pptx
+├── package.json                 # Node.js dependencies + scripts
+└── README.md                    # Project documentation</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════ 14. SETUP ════════════ -->
+<div class="section">
+  <h2>14. Setup & Deployment Guide</h2>
+
+  <h3>Prerequisites</h3>
+  <ul>
+    <li>Node.js v22+ (required for experimental <code>node:sqlite</code> module)</li>
+  </ul>
+
+  <h3>Web Application Setup</h3>
+  <pre><code># Clone the repository
+git clone &lt;repository-url&gt;
+cd rown
+
+# Install dependencies
+npm install
+
+# Seed the database with sample data
+npm run db:seed:all
+
+# Start the server
+npm start
+
+# Server runs at http://localhost:3001</code></pre>
+
+  <h3>Demo Credentials</h3>
+  <table>
+    <thead><tr><th>Role</th><th>ID</th><th>Password</th></tr></thead>
+    <tbody>
+      <tr><td>Student</td><td><code>30012151012341</code></td><td><code>123456</code></td></tr>
+      <tr><td>Doctor</td><td><code>29803050202394</code></td><td><code>123456</code></td></tr>
+      <tr><td>Admin</td><td><code>29803050202395</code></td><td><code>123456</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Available NPM Scripts</h3>
+  <table>
+    <thead><tr><th>Command</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>npm start</code></td><td>Start the server</td></tr>
+      <tr><td><code>npm run dev</code></td><td>Start with auto-reload (nodemon)</td></tr>
+      <tr><td><code>npm run db:clean</code></td><td>Wipe the database</td></tr>
+      <tr><td><code>npm run db:seed:all</code></td><td>Seed all data (doctor, students, schedule, staff)</td></tr>
+      <tr><td><code>npm run db:seed:doctor</code></td><td>Seed doctor/admin users only</td></tr>
+      <tr><td><code>npm run db:seed:students</code></td><td>Seed 20 students with grades/attendance</td></tr>
+      <tr><td><code>npm run db:seed:schedule</code></td><td>Seed class schedules</td></tr>
+      <tr><td><code>npm run db:seed:staff</code></td><td>Seed course staff assignments</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════ 15. FUTURE ═══════════ -->
+<div class="section">
+  <h2>15. Future Enhancements</h2>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Push Notifications</h4>
+      <p>Firebase Cloud Messaging for real-time grade updates and alert notifications on mobile.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Offline Mode</h4>
+      <p>Cache last-fetched data locally so students can view grades/schedule without internet.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Chat System</h4>
+      <p>Real-time messaging between students and doctors using WebSockets.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Assignment Tracking</h4>
+      <p>Submission system with deadlines, file uploads, and grading workflow.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Analytics Dashboard</h4>
+      <p>Admin-level analytics: department-wide GPA trends, attendance patterns, at-risk student identification.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Multi-Language Support</h4>
+      <p>Full Arabic localization with RTL layout support for the entire portal.</p>
+    </div>
+  </div>
+
+  <br>
+  <p style="text-align:center; color:#718096; font-size:12px; margin-top:40px;">
+    &mdash; End of Documentation &mdash;<br>
+    UniVision &copy; 2026 &bull; University Student Portal System
+  </p>
+</div>
+
+</body>
+</html>

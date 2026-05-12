@@ -71,8 +71,12 @@
 
     // If already logged in, go to the right page
     const { id, role } = Auth.getSession();
-    if (id) {
+    const hasCookie = document.cookie.includes("uv_role=");
+    if (id && hasCookie) {
       window.location.href = (role === "doctor" || role === "admin") ? "doctor.html" : "home.html";
+    } else if (id && !hasCookie) {
+      // Stale token without cookie — clear it to prevent redirect loop
+      localStorage.removeItem("uv_token");
     }
 
     let selectedRole = "student";
