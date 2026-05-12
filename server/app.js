@@ -1,5 +1,6 @@
 require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 const express = require("express");
+const cors    = require("cors");
 const path    = require("path");
 
 const { createSchema } = require("./db/schema");
@@ -14,6 +15,7 @@ const app      = express();
 const PORT     = process.env.PORT || 3001;
 const CLIENT   = path.join(__dirname, "../client");
 
+app.use(cors());
 app.use(express.json());
 
 // ── API Routes ─────────────────────────────────────────────

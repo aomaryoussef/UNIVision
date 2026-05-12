@@ -79,6 +79,21 @@ rown/
 │   └── scripts/             # Seed scripts (doctor, students, schedule, staff)
 ├── docs/
 │   └── UniVision_Presentation.pptx   # 20-slide animated presentation
+├── mobile/                  # Flutter Mobile App (Android & iOS)
+│   ├── lib/
+│   │   ├── main.dart        # App entry point
+│   │   ├── models/          # Data models
+│   │   ├── services/
+│   │   │   └── api_service.dart  # HTTP client for all API endpoints
+│   │   ├── providers/
+│   │   │   ├── auth_provider.dart   # Auth state management
+│   │   │   └── theme_provider.dart  # Theme system (8 themes)
+│   │   ├── screens/
+│   │   │   ├── auth/        # Login screen
+│   │   │   ├── student/     # All student screens (7 pages)
+│   │   │   └── doctor/      # Doctor/Admin dashboard screens
+│   │   └── widgets/         # Shared UI components
+│   └── pubspec.yaml         # Flutter dependencies
 └── package.json             # Unified scripts and dependencies
 ```
 
@@ -89,6 +104,7 @@ rown/
 ### Prerequisites
 
 - Node.js v22+ (uses experimental `node:sqlite`)
+- Flutter SDK 3.2+ (for mobile app)
 
 ### Installation
 
@@ -155,6 +171,40 @@ The app will be available at `http://localhost:3000` (or the port configured in 
 | GET    | `/api/student/:id/reports`      | Academic reports                |
 | GET    | `/api/student/:id/schedule`     | Class schedule                  |
 | GET    | `/api/health`                   | Health check                    |
+
+---
+
+## Mobile App (Flutter)
+
+The `mobile/` folder contains a full Flutter app for Android and iOS that connects to the same Express backend.
+
+### Setup
+
+```bash
+cd mobile
+flutter pub get
+```
+
+### Running
+
+1. Start the backend server first: `npm start` (from project root)
+2. Update the API base URL in `mobile/lib/services/api_service.dart`:
+   - Android emulator: `http://10.0.2.2:3000/api` (default)
+   - iOS simulator: `http://localhost:3000/api`
+   - Physical device: `http://<your-ip>:3000/api`
+3. Run the app:
+
+```bash
+flutter run
+```
+
+### Mobile App Features
+
+- Login with role selection (Student / Doctor / Admin)
+- **Student:** Home dashboard with alerts & charts, Grades, Attendance, Schedule, Reports, Performance Comparison, Profile
+- **Doctor/Admin:** Student list with search & grade filter, Student detail (Grades/Attendance/Feedback tabs), Schedule management, Add student (admin)
+- 8 themes matching the web app (5 dark + 3 light), persisted in device storage
+- Pull-to-refresh on all screens, animated progress bars, Chart.js-equivalent charts via fl_chart
 
 ---
 
