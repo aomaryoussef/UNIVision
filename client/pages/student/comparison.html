@@ -111,7 +111,7 @@
     .dist-bars { display: flex; gap: 6px; align-items: flex-end; height: 60px; margin-top: 10px; }
     .dist-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
     .dist-bar {
-      width: 100%; border-radius: 4px 4px 0 0; background: rgba(96,165,250,.3);
+      width: 100%; border-radius: 4px 4px 0 0; background: rgba(var(--accent-rgb),.3);
       min-height: 2px; transition: height .4s;
     }
     .dist-bar.mine { background: var(--accent); }
@@ -278,6 +278,12 @@
 
       // ── GPA Trend Chart ─────────────────────────────
       const trendCtx = document.getElementById("gpaTrendChart").getContext("2d");
+      const cs = getComputedStyle(document.documentElement);
+      const accentColor = cs.getPropertyValue('--accent').trim();
+      const accentRgb = cs.getPropertyValue('--accent-rgb').trim();
+      const secondaryColor = cs.getPropertyValue('--text-secondary').trim();
+      const mutedColor = cs.getPropertyValue('--text-muted').trim();
+      const successColor = cs.getPropertyValue('--success').trim();
       new Chart(trendCtx, {
         type: "line",
         data: {
@@ -286,24 +292,24 @@
             {
               label: "Your GPA",
               data: data.gpaTrend.map(t => t.myGPA),
-              borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
-              backgroundColor: "rgba(var(--accent-rgb),.1)",
+              borderColor: accentColor,
+              backgroundColor: `rgba(${accentRgb},.1)`,
               borderWidth: 2.5,
               tension: 0.3,
               fill: true,
-              pointBackgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+              pointBackgroundColor: accentColor,
               pointRadius: 5,
             },
             {
               label: "Class Average",
               data: data.gpaTrend.map(t => t.classAvg),
-              borderColor: "#60a5fa",
-              backgroundColor: "rgba(96,165,250,.08)",
+              borderColor: successColor,
+              backgroundColor: `rgba(${accentRgb},.04)`,
               borderWidth: 2,
               borderDash: [6, 3],
               tension: 0.3,
               fill: true,
-              pointBackgroundColor: "#60a5fa",
+              pointBackgroundColor: successColor,
               pointRadius: 4,
             },
           ],
@@ -311,11 +317,11 @@
         options: {
           responsive: true, maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: "#b0c4d8", font: { size: 11 } } },
+            legend: { labels: { color: secondaryColor, font: { size: 11 } } },
           },
           scales: {
-            x: { ticks: { color: "#607a94", font: { size: 10 } }, grid: { color: "rgba(255,255,255,.04)" } },
-            y: { min: 0, max: 4, ticks: { color: "#607a94", font: { size: 10 } }, grid: { color: "rgba(255,255,255,.04)" } },
+            x: { ticks: { color: mutedColor, font: { size: 10 } }, grid: { color: "rgba(255,255,255,.04)" } },
+            y: { min: 0, max: 4, ticks: { color: mutedColor, font: { size: 10 } }, grid: { color: "rgba(255,255,255,.04)" } },
           },
         },
       });
@@ -331,32 +337,32 @@
             {
               label: "You",
               data: data.courses.map(c => c.myScore),
-              borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
-              backgroundColor: "rgba(var(--accent-rgb),.15)",
+              borderColor: accentColor,
+              backgroundColor: `rgba(${accentRgb},.15)`,
               borderWidth: 2,
-              pointBackgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+              pointBackgroundColor: accentColor,
             },
             {
               label: "Class Average",
               data: data.courses.map(c => c.classAvg),
-              borderColor: "#60a5fa",
-              backgroundColor: "rgba(96,165,250,.1)",
+              borderColor: successColor,
+              backgroundColor: `rgba(${accentRgb},.06)`,
               borderWidth: 2,
-              pointBackgroundColor: "#60a5fa",
+              pointBackgroundColor: successColor,
             },
           ],
         },
         options: {
           responsive: true, maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: "#b0c4d8", font: { size: 11 } } },
+            legend: { labels: { color: secondaryColor, font: { size: 11 } } },
           },
           scales: {
             r: {
               beginAtZero: true, max: 100,
-              ticks: { color: "#607a94", backdropColor: "transparent", font: { size: 9 } },
+              ticks: { color: mutedColor, backdropColor: "transparent", font: { size: 9 } },
               grid: { color: "rgba(255,255,255,.06)" },
-              pointLabels: { color: "#b0c4d8", font: { size: 10 } },
+              pointLabels: { color: secondaryColor, font: { size: 10 } },
               angleLines: { color: "rgba(255,255,255,.06)" },
             },
           },

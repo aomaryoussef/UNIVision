@@ -165,7 +165,7 @@
     wrapper.className = "theme-switcher";
     wrapper.innerHTML = `
       <button class="theme-toggle" title="Change Theme">
-        <i class="fas fa-palette"></i>
+        <i class="fas fa-palette"></i><span>Theme</span>
       </button>
       <div class="theme-dropdown">
         <div class="theme-dropdown-title">Theme</div>
@@ -212,14 +212,15 @@
         margin-right: 8px;
       }
       .theme-toggle {
-        display: flex; align-items: center; justify-content: center;
-        width: 38px; height: 38px; border-radius: var(--radius-sm);
-        background: rgba(255,255,255,.04); border: 1px solid var(--border);
-        color: var(--text-muted); font-size: 1rem;
+        display: flex; align-items: center; justify-content: center; gap: 6px;
+        padding: 8px 14px; border-radius: var(--radius-sm);
+        background: rgba(var(--accent-rgb),.1); border: 1px solid rgba(var(--accent-rgb),.25);
+        color: var(--accent); font-size: 0.85rem; font-weight: 600;
         cursor: pointer; transition: all .2s;
       }
+      .theme-toggle span { font-size: 0.8rem; }
       .theme-toggle:hover {
-        background: rgba(255,255,255,.08); color: var(--accent);
+        background: rgba(var(--accent-rgb),.18);
         border-color: var(--accent);
       }
       .theme-dropdown {
