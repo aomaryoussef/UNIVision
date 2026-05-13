@@ -1,0 +1,20 @@
+| Grade | Percentage Range  | Grade Points |
+| ----- | ----------------- | ------------ |
+| A     | 90 and above      | 4.0          |
+| A-    | Less than 90 – 85 | 3.7          |
+| B+    | Less than 85 – 80 | 3.3          |
+| B     | Less than 80 – 75 | 3.0          |
+| C+    | Less than 75 – 70 | 2.7          |
+| C     | Less than 70 – 65 | 2.4          |
+| D+    | Less than 65 – 60 | 2.2          |
+| D     | Less than 60 – 50 | 2.0          |
+| F     | Less than 50      | 0.0          |
+
+| Cumulative GPA    | Overall Grade |
+| ----------------- | ------------- |
+| Less than 1.5     | Very Weak     |
+| 1.5 – Less than 2 | Weak          |
+| 2 – Less than 2.5 | Pass          |
+| 2.5 – Less than 3 | Good          |
+| 3 – Less than 3.6 | Very Good     |
+| 3.6 and above     | Excellent     |

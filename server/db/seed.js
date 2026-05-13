@@ -48,15 +48,15 @@ function seed() {
   );
   const allCourses = {
     1:[{n:"Calculus I",cr:3,g:"B",p:3.0,pr:74},{n:"Introduction to CS",cr:3,g:"B+",p:3.3,pr:84},
-       {n:"Logic Design",cr:3,g:"C+",p:2.3,pr:60},{n:"English I",cr:3,g:"A-",p:3.7,pr:90},{n:"Islamic Studies",cr:3,g:"A",p:4.0,pr:98}],
+       {n:"Logic Design",cr:3,g:"C+",p:2.7,pr:60},{n:"English I",cr:3,g:"A-",p:3.7,pr:90},{n:"Islamic Studies",cr:3,g:"A",p:4.0,pr:98}],
     2:[{n:"Calculus II",cr:3,g:"B+",p:3.3,pr:85},{n:"Physics",cr:3,g:"B",p:3.0,pr:76},
        {n:"Programming II",cr:3,g:"A-",p:3.7,pr:91},{n:"Statistics I",cr:3,g:"B",p:3.0,pr:75},{n:"English II",cr:3,g:"B+",p:3.3,pr:83}],
     3:[{n:"Data Structures",cr:3,g:"A",p:4.0,pr:98},{n:"Algorithms",cr:3,g:"A-",p:3.7,pr:93},
        {n:"Networks",cr:3,g:"B+",p:3.3,pr:86},{n:"Databases",cr:3,g:"B",p:3.0,pr:78},
-       {n:"OOP",cr:3,g:"B+",p:3.3,pr:84},{n:"Math III",cr:3,g:"B-",p:2.7,pr:70}],
+       {n:"OOP",cr:3,g:"B+",p:3.3,pr:84},{n:"Math III",cr:3,g:"C+",p:2.7,pr:70}],
     4:[{n:"Human Resources",cr:3,g:"A",p:4.0,pr:100},{n:"Marketing",cr:3,g:"B+",p:3.3,pr:85},
-       {n:"Statistics",cr:3,g:"B",p:3.0,pr:75},{n:"Project Management",cr:3,g:"C+",p:2.3,pr:60},
-       {n:"Economics",cr:3,g:"D",p:1.0,pr:32}],
+       {n:"Statistics",cr:3,g:"B",p:3.0,pr:75},{n:"Project Management",cr:3,g:"C+",p:2.7,pr:60},
+       {n:"Economics",cr:3,g:"D",p:2.0,pr:32}],
   };
   for (const [num, courses] of Object.entries(allCourses)) {
     const sid = getSem(Number(num));
