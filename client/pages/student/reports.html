@@ -175,6 +175,16 @@
       }
       .pr-footer strong { color: #1e293b; }
     }
+    @media screen and (max-width: 768px) {
+      .page-wrap { padding: 20px 16px; }
+      .sem-select-wrap { flex-direction: column; align-items: stretch; }
+      .sem-select-wrap select { max-width: none; }
+      .detail-header { flex-direction: column; }
+      .detail-stats { gap: 12px; }
+      .d-stat .val { font-size: 0.95rem; }
+      table { font-size: 0.8rem; }
+      th, td { padding: 8px 10px; }
+    }
   </style>
   <script src="/js/theme.js"></script>
 </head>
@@ -187,6 +197,7 @@
       </div>
       <div class="nav-user"><span>Student</span><strong id="navName">—</strong></div>
     </div>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-menu').classList.toggle('open')"><i class="fas fa-bars"></i></button>
     <ul class="nav-menu">
       <li class="nav-item"><a href="home.html"><i class="fas fa-th-large"></i><span>Home</span></a></li>
       <li class="nav-item"><a href="grades.html"><i class="fas fa-star"></i><span>Grades</span></a></li>
@@ -196,6 +207,7 @@
       <li class="nav-item"><a href="schedule.html"><i class="fas fa-clock"></i><span>Schedule</span></a></li>
       <li class="nav-item"><a href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a></li>
     </ul>
+    <div class="notif-bell" id="notifBell"><i class="fas fa-bell"></i><span class="notif-badge-count" id="notifCount" style="display:none;">0</span><div class="notif-dropdown" id="notifDropdown"></div></div>
     <button id="logoutBtn" style="display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;color:var(--danger);border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);cursor:pointer;transition:all .2s;">
       <i class="fas fa-sign-out-alt"></i><span>Logout</span>
     </button>
@@ -224,11 +236,13 @@
 
   <script type="module">
     import { Auth, StudentAPI } from "/js/student-api.js";
+    import { initNotifications } from "/js/notifications.js";
 
     const { id, role, name } = Auth.getSession();
     if (!id || role === "doctor" || role === "admin") {
       window.location.href = (role === "doctor" || role === "admin") ? "doctor.html" : "/";
     }
+    initNotifications(id);
     document.getElementById("navName").textContent = name || "—";
     document.getElementById("logoutBtn").addEventListener("click", () => Auth.logout());
 
@@ -339,7 +353,7 @@
       return "";
     }
 
-    function printReport() {
+    async function printReport() {
       if (!currentSem) return;
 
       const p    = studentProf || {};
@@ -347,8 +361,17 @@
       const GRADE_LABEL = { 1:"First Year — Freshman", 2:"Second Year — Sophomore", 3:"Third Year — Junior", 4:"Fourth Year — Senior" };
       const now  = new Date().toLocaleDateString("en-GB", { day:"2-digit", month:"long", year:"numeric" });
 
-      // Resolve the logo to an absolute URL for print
-      const logoSrc = new URL("logo.png", window.location.href).href;
+      // Convert logo to base64 so it appears reliably in print/PDF
+      let logoSrc = "/assets/logo.png";
+      try {
+        const resp = await fetch("/assets/logo.png");
+        const blob = await resp.blob();
+        logoSrc = await new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      } catch {}
 
       const rows = (sem.courses || []).map((c, i) => `
         <tr>

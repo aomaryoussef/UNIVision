@@ -113,6 +113,21 @@ function createSchema() {
       is_urgent   INTEGER NOT NULL DEFAULT 0,
       created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
     );
+    CREATE TABLE IF NOT EXISTS notifications (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      admin_id    TEXT    NOT NULL REFERENCES users(id),
+      admin_name  TEXT    NOT NULL,
+      category    TEXT    NOT NULL DEFAULT 'general' CHECK(category IN ('day_off','lecture_cancelled','event','holiday','exam','general')),
+      title       TEXT    NOT NULL,
+      body        TEXT    NOT NULL,
+      created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS notification_reads (
+      notification_id INTEGER NOT NULL REFERENCES notifications(id) ON DELETE CASCADE,
+      student_id      TEXT    NOT NULL REFERENCES users(id),
+      read_at         TEXT    NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (notification_id, student_id)
+    );
   `);
   // Migration: add grade column to existing databases
   try { db.exec("ALTER TABLE student_profiles ADD COLUMN grade INTEGER NOT NULL DEFAULT 1"); } catch {}

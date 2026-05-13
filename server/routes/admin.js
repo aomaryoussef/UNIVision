@@ -39,4 +39,39 @@ router.post("/students", (req, res) => {
   res.status(201).json({ ok: true, id });
 });
 
+// ── Notifications ──────────────────────────────────────────
+router.get("/notifications", (req, res) => {
+  const db = getDb();
+  const rows = db.prepare(
+    "SELECT * FROM notifications ORDER BY created_at DESC"
+  ).all();
+  res.json(rows);
+});
+
+router.post("/notifications", (req, res) => {
+  const { category, title, body } = req.body;
+  if (!title || !body) return res.status(400).json({ error: "title and body are required" });
+
+  const validCats = ["day_off", "lecture_cancelled", "event", "holiday", "exam", "general"];
+  const cat = validCats.includes(category) ? category : "general";
+
+  const db = getDb();
+  const adminUser = db.prepare("SELECT name FROM users WHERE id=?").get(req.user.id);
+  const adminName = adminUser ? adminUser.name : "Admin";
+
+  const result = db.prepare(
+    "INSERT INTO notifications (admin_id, admin_name, category, title, body) VALUES (?,?,?,?,?)"
+  ).run(req.user.id, adminName, cat, title, body);
+
+  res.status(201).json({ ok: true, id: result.lastInsertRowid });
+});
+
+router.delete("/notifications/:id", (req, res) => {
+  const db = getDb();
+  db.prepare("DELETE FROM notification_reads WHERE notification_id=?").run(req.params.id);
+  const result = db.prepare("DELETE FROM notifications WHERE id=?").run(req.params.id);
+  if (result.changes === 0) return res.status(404).json({ error: "Not found" });
+  res.json({ ok: true });
+});
+
 module.exports = router;

@@ -61,4 +61,9 @@ export const StudentAPI = {
   report:     (sid, sem) => apiFetch(`/student/${sid}/reports/${sem}`),
   schedule:   (sid) => apiFetch(`/student/${sid}/schedule`),
   comparison: (sid) => apiFetch(`/student/${sid}/comparison`),
+
+  // Notifications
+  notifications:    (sid) => apiFetch(`/student/${sid}/notifications`),
+  markNotifRead:    (sid, nid) => apiFetch(`/student/${sid}/notifications/${nid}/read`, { method: "POST" }),
+  markAllNotifsRead:(sid) => apiFetch(`/student/${sid}/notifications/read-all`, { method: "POST" }),
 };

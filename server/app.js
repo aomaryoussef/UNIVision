@@ -24,6 +24,7 @@ try {
     execSync(`node "${path.join(scriptsDir, "seed-students.js")}"`, { stdio: "inherit" });
     execSync(`node "${path.join(scriptsDir, "seed-schedule.js")}"`, { stdio: "inherit" });
     execSync(`node "${path.join(scriptsDir, "seed-staff.js")}"`,    { stdio: "inherit" });
+    execSync(`node "${path.join(scriptsDir, "seed-notifications.js")}"`, { stdio: "inherit" });
     console.log("  Seeding complete.\n");
   }
 } catch (e) {

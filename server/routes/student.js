@@ -243,4 +243,44 @@ router.get("/:studentId/comparison", (req, res) => {
   });
 });
 
+// ── Notifications ──────────────────────────────────────────
+router.get("/:studentId/notifications", (req, res) => {
+  const db = getDb();
+  const sid = req.params.studentId;
+  const rows = db.prepare(`
+    SELECT n.*, 
+           CASE WHEN nr.student_id IS NOT NULL THEN 1 ELSE 0 END AS is_read
+    FROM notifications n
+    LEFT JOIN notification_reads nr
+      ON nr.notification_id = n.id AND nr.student_id = ?
+    ORDER BY n.created_at DESC
+    LIMIT 50
+  `).all(sid);
+  const unread = rows.filter(r => !r.is_read).length;
+  res.json({ notifications: rows, unread });
+});
+
+router.post("/:studentId/notifications/:notifId/read", (req, res) => {
+  const db = getDb();
+  const sid = req.params.studentId;
+  const nid = req.params.notifId;
+  try {
+    db.prepare(
+      "INSERT OR IGNORE INTO notification_reads (notification_id, student_id) VALUES (?,?)"
+    ).run(nid, sid);
+  } catch {}
+  res.json({ ok: true });
+});
+
+router.post("/:studentId/notifications/read-all", (req, res) => {
+  const db = getDb();
+  const sid = req.params.studentId;
+  const notifs = db.prepare("SELECT id FROM notifications").all();
+  const stmt = db.prepare(
+    "INSERT OR IGNORE INTO notification_reads (notification_id, student_id) VALUES (?,?)"
+  );
+  for (const n of notifs) stmt.run(n.id, sid);
+  res.json({ ok: true });
+});
+
 module.exports = router;
