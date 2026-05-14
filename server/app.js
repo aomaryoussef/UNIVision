@@ -10,6 +10,7 @@ const authRoutes    = require("./routes/auth");
 const studentRoutes = require("./routes/student");
 const doctorRoutes  = require("./routes/doctor");
 const adminRoutes   = require("./routes/admin");
+const chatRoutes    = require("./routes/chat");
 
 createSchema();
 
@@ -42,6 +43,7 @@ app.use("/api/auth",    authRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/doctor",  doctorRoutes);
 app.use("/api/admin",   adminRoutes);
+app.use("/api/student", chatRoutes);
 
 app.get("/api/health", (_req, res) =>
   res.json({ status: "ok", time: new Date().toISOString() })

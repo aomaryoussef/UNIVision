@@ -66,4 +66,10 @@ export const StudentAPI = {
   notifications:    (sid) => apiFetch(`/student/${sid}/notifications`),
   markNotifRead:    (sid, nid) => apiFetch(`/student/${sid}/notifications/${nid}/read`, { method: "POST" }),
   markAllNotifsRead:(sid) => apiFetch(`/student/${sid}/notifications/read-all`, { method: "POST" }),
+
+  // AI Chatbot
+  chat: (sid, messages) => apiFetch(`/student/${sid}/chat`, {
+    method: "POST",
+    body: JSON.stringify({ messages }),
+  }),
 };

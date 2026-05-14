@@ -590,3 +590,426 @@ html.light-theme .feedback-card p { color: var(--text-secondary); }
 html.light-theme .nav-item a:hover { background: rgba(0,0,0,0.04); }
 html.light-theme .footer { border-top-color: rgba(0,0,0,0.06); }
 html.light-theme .nav-menu { background: rgba(255,255,255,0.97); }
+
+/* ══════════════════════════════════════════════════════════
+   UniBot — AI Chatbot
+   ══════════════════════════════════════════════════════════ */
+
+/* Floating Action Button */
+#unibot-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.4);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#unibot-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 28px rgba(var(--accent-rgb), 0.55);
+}
+#unibot-fab.unibot-fab-active {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* Pulse ring */
+.unibot-fab-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  animation: unibot-pulse 2s infinite;
+  pointer-events: none;
+}
+#unibot-fab.unibot-fab-active .unibot-fab-pulse { display: none; }
+@keyframes unibot-pulse {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  70%  { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* Chat Panel */
+#unibot-panel {
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  z-index: 9998;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  height: 560px;
+  max-height: calc(100vh - 140px);
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: opacity 0.25s, transform 0.25s;
+}
+#unibot-panel.unibot-closed {
+  opacity: 0;
+  transform: translateY(16px) scale(0.95);
+  pointer-events: none;
+}
+#unibot-panel.unibot-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Header */
+.unibot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #fff;
+  flex-shrink: 0;
+}
+.unibot-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.unibot-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.unibot-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.unibot-subtitle {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+.unibot-header-actions {
+  display: flex;
+  gap: 4px;
+}
+.unibot-header-actions button {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+.unibot-header-actions button:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Messages area */
+.unibot-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Welcome screen */
+.unibot-welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 8px;
+  gap: 8px;
+}
+.unibot-welcome-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+.unibot-welcome h3 {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+.unibot-welcome p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+.unibot-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.unibot-suggestion {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.unibot-suggestion:hover {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.08);
+}
+
+/* Message bubbles */
+.unibot-msg {
+  display: flex;
+  gap: 8px;
+  max-width: 88%;
+  animation: unibot-fadeIn 0.25s ease-out;
+}
+@keyframes unibot-fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.unibot-msg-user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.unibot-msg-model {
+  align-self: flex-start;
+}
+.unibot-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.unibot-msg-bubble {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  word-break: break-word;
+}
+.unibot-msg-user .unibot-msg-bubble {
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.unibot-msg-model .unibot-msg-bubble {
+  background: var(--bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.unibot-msg-error .unibot-msg-bubble {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+/* Markdown in bot messages */
+.unibot-msg-model .unibot-msg-bubble strong { font-weight: 700; }
+.unibot-msg-model .unibot-msg-bubble code {
+  background: rgba(var(--accent-rgb), 0.1);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+.unibot-msg-model .unibot-msg-bubble pre {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+.unibot-msg-model .unibot-msg-bubble pre code {
+  background: none;
+  padding: 0;
+}
+.unibot-msg-model .unibot-msg-bubble ul,
+.unibot-msg-model .unibot-msg-bubble ol {
+  margin: 6px 0;
+  padding-left: 18px;
+}
+.unibot-msg-model .unibot-msg-bubble li {
+  margin-bottom: 3px;
+}
+
+/* Typing indicator */
+.unibot-typing {
+  display: flex;
+  gap: 5px;
+  padding: 4px 0;
+}
+.unibot-typing span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: unibot-bounce 1.4s infinite;
+}
+.unibot-typing span:nth-child(2) { animation-delay: 0.2s; }
+.unibot-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes unibot-bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* Input area */
+.unibot-input-area {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.unibot-input-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px 8px 6px 14px;
+  transition: border-color 0.2s;
+}
+.unibot-input-wrap:focus-within {
+  border-color: var(--accent);
+}
+#unibot-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  resize: none;
+  max-height: 120px;
+  font-family: inherit;
+}
+#unibot-input::placeholder {
+  color: var(--text-muted);
+}
+#unibot-send {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+#unibot-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: scale(0.95);
+}
+#unibot-send:not(:disabled):hover {
+  transform: scale(1.05);
+}
+.unibot-powered {
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  #unibot-panel {
+    bottom: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  #unibot-fab {
+    bottom: 16px;
+    right: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+}
+
+/* Hide chatbot during print */
+@media print {
+  #unibot { display: none !important; }
+}
+
+/* Follow-up choice buttons */
+.unibot-followups {
+  animation: unibot-fadeIn 0.3s ease-out;
+  padding: 4px 0 4px 36px;
+}
+.unibot-followups[dir="rtl"] {
+  padding: 4px 36px 4px 0;
+}
+.unibot-followups-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.unibot-followups-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.unibot-followups .unibot-suggestion {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.73rem;
+}
+
+/* RTL support for Arabic messages */
+.unibot-msg[dir="rtl"] {
+  direction: rtl;
+}
+.unibot-msg[dir="rtl"] .unibot-msg-bubble {
+  text-align: right;
+}
+.unibot-msg[dir="rtl"] .unibot-msg-bubble ul,
+.unibot-msg[dir="rtl"] .unibot-msg-bubble ol {
+  padding-left: 0;
+  padding-right: 18px;
+}

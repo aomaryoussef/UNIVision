@@ -237,10 +237,12 @@
   <script type="module">
     import { Auth, StudentAPI } from '/js/student-api.js';
     import { initNotifications } from '/js/notifications.js';
+    import { initChatbot } from '/js/chatbot.js';
 
     const session = Auth.getSession();
     if (!session.id || session.role !== 'student') { window.location.href = '/'; }
     initNotifications(session.id);
+    initChatbot(session.id);
     document.getElementById("navName").textContent = session.name || session.id;
     document.getElementById("logoutBtn").addEventListener("click", () => Auth.logout());
 

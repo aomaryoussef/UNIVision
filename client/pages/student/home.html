@@ -301,12 +301,14 @@
   <script type="module">
     import { Auth, StudentAPI } from "/js/student-api.js";
     import { initNotifications } from "/js/notifications.js";
+    import { initChatbot } from "/js/chatbot.js";
 
     const { id, role, name } = Auth.getSession();
     if (!id || role === "doctor" || role === "admin") {
       window.location.href = (role === "doctor" || role === "admin") ? "doctor.html" : "/";
     }
     initNotifications(id);
+    initChatbot(id);
 
     document.getElementById("navName").textContent  = name || "—";
     document.getElementById("greetName").textContent = name || "—";
