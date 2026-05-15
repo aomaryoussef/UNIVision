@@ -334,8 +334,8 @@ input, select { font-family: inherit; }
 /* ── University Resources Grid ─────────────────────────── */
 .resources-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
 .resources-grid .nav-card {
   display: flex; align-items: center; gap: 12px;
