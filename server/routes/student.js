@@ -99,7 +99,33 @@ router.get("/:studentId/home", (req, res) => {
     }
   }
 
-  res.json({ cumulativeGPA: currentGPA, attendance: att, gpaHistory: history, topStudents, grade, alerts });
+  res.json({ cumulativeGPA: currentGPA, attendance: att, gpaHistory: history, topStudents, grade, alerts,
+    // ── Extra data for enhanced dashboard ──
+    credits: latest?.credits ?? null,
+    semesterCount: history.length,
+    courseCount: courseAtt.length,
+    dangerCourseCount: dangerGrades.length,
+    gpaRank: (() => {
+      if (currentGPA == null) return null;
+      const allGPAs = peers.map(p => db.prepare("SELECT gpa FROM semesters WHERE student_id=? ORDER BY semester_number DESC LIMIT 1").get(p)?.gpa).filter(g => g != null);
+      return { rank: allGPAs.filter(g => g > currentGPA).length + 1, total: allGPAs.length };
+    })(),
+    courseProgress: db.prepare("SELECT course_name, pre_final, max_pre_final, grade, is_danger FROM grades WHERE student_id=?").all(sid).map(g => ({
+      course: g.course_name,
+      preFinal: g.pre_final,
+      maxPreFinal: g.max_pre_final,
+      percentage: g.max_pre_final ? Math.round(g.pre_final / g.max_pre_final * 100) : 0,
+      grade: g.grade,
+      danger: !!g.is_danger,
+    })),
+    todaySchedule: (() => {
+      const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      const todayName = days[new Date().getDay()];
+      return db.prepare("SELECT course_name, start_time, end_time, type, location AS room, doctor_name FROM schedule WHERE semester=? AND day=? ORDER BY start_time").all(grade, todayName);
+    })(),
+    recentFeedback: db.prepare("SELECT course_name, doctor_name, body, is_danger, created_at FROM feedback WHERE student_id=? ORDER BY created_at DESC LIMIT 3").all(sid),
+    recentNotifications: db.prepare("SELECT title, body, category, created_at FROM notifications ORDER BY created_at DESC LIMIT 3").all(),
+  });
 });
 
 router.get("/:studentId/attendance", (req, res) => {

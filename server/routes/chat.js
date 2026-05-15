@@ -55,7 +55,7 @@ function getStudentContext(sid) {
     },
     schedule: schedule.map(s => ({
       day: s.day, time: `${s.start_time}–${s.end_time}`,
-      course: s.course_name, type: s.type, room: s.room, doctor: s.doctor_name,
+      course: s.course_name, type: s.type, room: s.location, doctor: s.doctor_name,
     })),
     feedback,
     notifications,
