@@ -1,7 +1,6 @@
-node_modules/
-.vercel
-.env*.local
-.env
+node_modules
+.git
 server/db/univision.db
 server/db/univision.db-wal
 server/db/univision.db-shm
+.env
