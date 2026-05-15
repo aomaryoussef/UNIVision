@@ -11,6 +11,10 @@
           "client/**"
         ]
       }
+    },
+    {
+      "src": "client/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
