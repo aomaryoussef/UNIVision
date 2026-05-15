@@ -2,7 +2,6 @@ require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 const express = require("express");
 const cors    = require("cors");
 const path    = require("path");
-const { execSync } = require("child_process");
 
 const { createSchema } = require("./db/schema");
 const { getDb }        = require("./db/database");
@@ -14,18 +13,18 @@ const chatRoutes    = require("./routes/chat");
 
 createSchema();
 
-// Auto-seed if database is empty (first deploy)
+// Auto-seed if database is empty (first deploy / cold start)
 try {
   const db = getDb();
   const row = db.prepare("SELECT COUNT(*) as cnt FROM users").get();
   if (row.cnt === 0) {
     console.log("  Empty database detected — running seeds...");
-    const scriptsDir = path.join(__dirname, "scripts");
-    execSync(`node "${path.join(scriptsDir, "seed-doctor.js")}"`,  { stdio: "inherit" });
-    execSync(`node "${path.join(scriptsDir, "seed-students.js")}"`, { stdio: "inherit" });
-    execSync(`node "${path.join(scriptsDir, "seed-schedule.js")}"`, { stdio: "inherit" });
-    execSync(`node "${path.join(scriptsDir, "seed-staff.js")}"`,    { stdio: "inherit" });
-    execSync(`node "${path.join(scriptsDir, "seed-notifications.js")}"`, { stdio: "inherit" });
+    require("./scripts/seed-doctor");
+    require("./scripts/seed-students");
+    require("./scripts/seed-schedule");
+    require("./scripts/seed-staff");
+    require("./scripts/seed-notifications");
+    require("./scripts/seed-materials");
     console.log("  Seeding complete.\n");
   }
 } catch (e) {
@@ -59,7 +58,7 @@ function getCookie(req, name) {
 }
 
 // ── Role-based page guards (before static) ─────────────────
-const STUDENT_PAGES = ["/home.html", "/grades.html", "/attendance.html", "/reports.html", "/profile.html", "/schedule.html", "/comparison.html"];
+const STUDENT_PAGES = ["/home.html", "/grades.html", "/attendance.html", "/reports.html", "/profile.html", "/schedule.html", "/comparison.html", "/work.html", "/simulator.html", "/materials.html"];
 const DOCTOR_PAGES  = ["/doctor.html"];
 
 app.use((req, res, next) => {
@@ -96,6 +95,9 @@ app.get("/attendance.html", (_req, res) => res.sendFile(path.join(CLIENT, "pages
 app.get("/comparison.html", (_req, res) => res.sendFile(path.join(CLIENT, "pages/student/comparison.html")));
 app.get("/reports.html",    (_req, res) => res.sendFile(path.join(CLIENT, "pages/student/reports.html")));
 app.get("/schedule.html",   (_req, res) => res.sendFile(path.join(CLIENT, "pages/student/schedule.html")));
+app.get("/work.html",       (_req, res) => res.sendFile(path.join(CLIENT, "pages/student/work.html")));
+app.get("/simulator.html",  (_req, res) => res.sendFile(path.join(CLIENT, "pages/student/simulator.html")));
+app.get("/materials.html",  (_req, res) => res.sendFile(path.join(CLIENT, "pages/student/materials.html")));
 app.get("/profile.html",    (_req, res) => res.sendFile(path.join(CLIENT, "pages/student/profile.html")));
 
 // ── Doctor / Admin page ────────────────────────────────────
@@ -114,7 +116,12 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
-app.listen(PORT, () => {
-  console.log(`\n  Univision  ->  http://localhost:${PORT}`);
-  console.log(`  Doctor     ->  http://localhost:${PORT}/doctor.html\n`);
-});
+// Only listen when running directly (not on Vercel)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`\n  Univision  ->  http://localhost:${PORT}`);
+    console.log(`  Doctor     ->  http://localhost:${PORT}/doctor.html\n`);
+  });
+}
+
+module.exports = app;

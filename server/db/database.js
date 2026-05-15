@@ -1,13 +1,20 @@
-const { DatabaseSync } = require("node:sqlite");
+const Database = require("better-sqlite3");
 const path = require("path");
+const fs = require("fs");
 
-const DB_PATH = path.join(__dirname, "univision.db");
+// On Vercel (serverless), use /tmp for writable storage; otherwise use local path
+const isVercel = !!process.env.VERCEL;
+const DB_PATH = isVercel
+  ? "/tmp/univision.db"
+  : path.join(__dirname, "univision.db");
+
 let _db = null;
 
 function getDb() {
   if (!_db) {
-    _db = new DatabaseSync(DB_PATH);
-    _db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;");
+    _db = new Database(DB_PATH);
+    _db.pragma("journal_mode = WAL");
+    _db.pragma("foreign_keys = ON");
   }
   return _db;
 }

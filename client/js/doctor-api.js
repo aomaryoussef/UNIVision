@@ -73,6 +73,11 @@ export const DoctorAPI = {
   updateAdminFeedback: (id, data)  => apiFetch(`/doctor/admin-feedback/${id}`,          { method: "PUT",  body: JSON.stringify(data) }),
   deleteAdminFeedback: (id)        => apiFetch(`/doctor/admin-feedback/${id}`,           { method: "DELETE" }),
 
+  // Course Materials
+  getMaterials:       ()           => apiFetch("/doctor/materials"),
+  addMaterial:        (data)       => apiFetch("/doctor/materials", { method: "POST", body: JSON.stringify(data) }),
+  deleteMaterial:     (id)         => apiFetch(`/doctor/material/${id}`, { method: "DELETE" }),
+
   // Notifications (admin only)
   getNotifications:    ()          => apiFetch("/admin/notifications"),
   createNotification:  (data)      => apiFetch("/admin/notifications", { method: "POST", body: JSON.stringify(data) }),

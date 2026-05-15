@@ -125,6 +125,11 @@ router.get("/:studentId/home", (req, res) => {
     })(),
     recentFeedback: db.prepare("SELECT course_name, doctor_name, body, is_danger, created_at FROM feedback WHERE student_id=? ORDER BY created_at DESC LIMIT 3").all(sid),
     recentNotifications: db.prepare("SELECT title, body, category, created_at FROM notifications ORDER BY created_at DESC LIMIT 3").all(),
+    upcomingExams: (() => {
+      const today = new Date().toISOString().slice(0, 10);
+      return db.prepare("SELECT * FROM exams WHERE semester=? AND exam_date>=? ORDER BY exam_date ASC LIMIT 5").all(grade, today);
+    })(),
+    recentActivity: db.prepare("SELECT action, detail, page, created_at FROM activity_log WHERE student_id=? ORDER BY created_at DESC LIMIT 8").all(sid),
   });
 });
 
@@ -306,6 +311,65 @@ router.post("/:studentId/notifications/read-all", (req, res) => {
     "INSERT OR IGNORE INTO notification_reads (notification_id, student_id) VALUES (?,?)"
   );
   for (const n of notifs) stmt.run(n.id, sid);
+  res.json({ ok: true });
+});
+
+// ── CV Data ─────────────────────────────────────────────────
+router.get("/:studentId/cv", (req, res) => {
+  const db = getDb();
+  const row = db.prepare("SELECT data FROM cv_data WHERE student_id=?").get(req.params.studentId);
+  res.json(row ? JSON.parse(row.data) : {});
+});
+
+router.put("/:studentId/cv", (req, res) => {
+  const db = getDb();
+  const sid = req.params.studentId;
+  const json = JSON.stringify(req.body);
+  db.prepare(
+    "INSERT INTO cv_data (student_id, data, updated_at) VALUES (?,?,datetime('now')) ON CONFLICT(student_id) DO UPDATE SET data=excluded.data, updated_at=datetime('now')"
+  ).run(sid, json);
+  res.json({ ok: true });
+});
+
+// ── Exams (upcoming) ────────────────────────────────────────
+router.get("/:studentId/exams", (req, res) => {
+  const db = getDb();
+  const profile = db.prepare("SELECT grade FROM student_profiles WHERE student_id=?").get(req.params.studentId);
+  const semester = profile?.grade || 1;
+  const today = new Date().toISOString().slice(0, 10);
+  const exams = db.prepare(
+    "SELECT * FROM exams WHERE semester=? AND exam_date>=? ORDER BY exam_date ASC, start_time ASC"
+  ).all(semester, today);
+  res.json(exams);
+});
+
+// ── Course Materials ────────────────────────────────────────
+router.get("/:studentId/materials", (req, res) => {
+  const db = getDb();
+  // Get courses for this student's current semester
+  const profile = db.prepare("SELECT grade FROM student_profiles WHERE student_id=?").get(req.params.studentId);
+  const semester = profile?.grade || 1;
+  const courses = db.prepare("SELECT DISTINCT course_name FROM grades WHERE student_id=?").all(req.params.studentId).map(c => c.course_name);
+  if (!courses.length) return res.json([]);
+  const placeholders = courses.map(() => '?').join(',');
+  const materials = db.prepare(
+    `SELECT cm.*, u.name AS doctor_name FROM course_materials cm LEFT JOIN users u ON u.id=cm.doctor_id WHERE cm.course_name IN (${placeholders}) ORDER BY cm.created_at DESC`
+  ).all(...courses);
+  res.json(materials);
+});
+
+// ── Activity Log ────────────────────────────────────────────
+router.get("/:studentId/activity", (req, res) => {
+  const db = getDb();
+  const logs = db.prepare("SELECT * FROM activity_log WHERE student_id=? ORDER BY created_at DESC LIMIT 30").all(req.params.studentId);
+  res.json(logs);
+});
+
+router.post("/:studentId/activity", (req, res) => {
+  const db = getDb();
+  const { action, detail, page } = req.body;
+  db.prepare("INSERT INTO activity_log (student_id, action, detail, page, created_at) VALUES (?,?,?,?,datetime('now'))")
+    .run(req.params.studentId, action, detail || null, page || null);
   res.json({ ok: true });
 });
 

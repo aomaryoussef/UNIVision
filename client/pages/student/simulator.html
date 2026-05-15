@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Univision — GPA Simulator</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    .page-wrap { padding: 0 32px 48px; max-width: 1100px; margin: 0 auto; margin-top: var(--nav-h); }
+
+    /* Hero */
+    .sim-hero {
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, rgba(var(--accent-rgb),.12) 0%, rgba(168,85,247,.08) 50%, rgba(var(--accent-rgb),.04) 100%);
+      border: 1px solid rgba(var(--accent-rgb),.12);
+      border-radius: var(--radius); padding: 32px 36px; margin: 24px 0 28px;
+    }
+    .sim-hero::before {
+      content:''; position:absolute; top:-60px; right:-40px; width:200px; height:200px; border-radius:50%;
+      background:radial-gradient(circle,rgba(var(--accent-rgb),.1),transparent 70%); pointer-events:none;
+    }
+    .sim-hero h1 {
+      font-size:1.6rem; font-weight:900; margin-bottom:6px;
+      background:linear-gradient(135deg,var(--text-primary),var(--accent));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .sim-hero p { color:var(--text-secondary); font-size:.88rem; line-height:1.6; position:relative; z-index:1; }
+
+    /* Current GPA display */
+    .gpa-display {
+      display: flex; gap: 24px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .gpa-box {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px 28px;
+      flex: 1; min-width: 200px; text-align: center;
+      transition: transform .2s, border-color .2s;
+    }
+    .gpa-box:hover { transform: translateY(-2px); border-color: rgba(var(--accent-rgb),.2); }
+    .gpa-box .gpa-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .8px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+    .gpa-box .gpa-value { font-size: 2.2rem; font-weight: 900; line-height: 1; }
+    .gpa-box .gpa-value.current { color: var(--text-primary); }
+    .gpa-box .gpa-value.simulated { color: var(--accent); }
+    .gpa-box .gpa-change { font-size: .82rem; font-weight: 700; margin-top: 8px; }
+    .gpa-box .gpa-change.up   { color: var(--success); }
+    .gpa-box .gpa-change.down { color: var(--danger); }
+    .gpa-box .gpa-change.same { color: var(--text-muted); }
+
+    /* Simulator card */
+    .sim-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; margin-bottom: 24px;
+    }
+    .sim-card-title {
+      font-size: .8rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; color: var(--text-muted); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sim-card-title i { color: var(--accent); }
+
+    /* Course rows */
+    .sim-table { width: 100%; border-collapse: collapse; }
+    .sim-table th {
+      font-size: .7rem; text-transform: uppercase; letter-spacing: .6px;
+      color: var(--text-muted); font-weight: 600; padding: 8px 12px;
+      text-align: left; border-bottom: 2px solid var(--border);
+    }
+    .sim-table td {
+      padding: 12px; border-bottom: 1px solid var(--border);
+      font-size: .88rem;
+    }
+    .sim-table tr:last-child td { border-bottom: none; }
+    .sim-table .course-name { font-weight: 700; }
+    .sim-table .credits { text-align: center; color: var(--text-secondary); font-weight: 600; }
+    .sim-table .current-grade {
+      text-align: center; font-weight: 700;
+    }
+    .sim-table select {
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,.03);
+      color: var(--text-primary); font-size: .85rem; font-family: inherit;
+      cursor: pointer; transition: border-color .2s; outline: none;
+      min-width: 80px;
+    }
+    .sim-table select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),.1); }
+    .sim-table .impact { text-align: center; font-weight: 700; font-size: .82rem; }
+    .sim-table .impact.up   { color: var(--success); }
+    .sim-table .impact.down { color: var(--danger); }
+    .sim-table .impact.same { color: var(--text-muted); }
+
+    /* Add course row */
+    .add-course-row {
+      display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; align-items: flex-end;
+    }
+    .add-course-row .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .add-course-row label { font-size: .68rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    .add-course-row input, .add-course-row select {
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: rgba(255,255,255,.03);
+      color: var(--text-primary); font-size: .85rem; font-family: inherit; outline: none;
+    }
+    .add-course-row input:focus, .add-course-row select:focus { border-color: var(--accent); }
+    .add-course-btn {
+      padding: 8px 18px; border-radius: var(--radius-sm);
+      border: 1px solid rgba(var(--accent-rgb),.3);
+      background: rgba(var(--accent-rgb),.08); color: var(--accent);
+      font-size: .82rem; font-weight: 700; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .add-course-btn:hover { background: rgba(var(--accent-rgb),.15); }
+
+    /* Reset button */
+    .sim-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }
+    .sim-btn {
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      font-size: .82rem; font-weight: 700; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .sim-btn.reset {
+      border: 1px solid rgba(239,68,68,.25); background: rgba(239,68,68,.06); color: var(--danger);
+    }
+    .sim-btn.reset:hover { background: rgba(239,68,68,.12); }
+
+    /* Tip card */
+    .tip-card {
+      background: rgba(var(--accent-rgb),.04); border: 1px solid rgba(var(--accent-rgb),.12);
+      border-radius: var(--radius); padding: 20px 24px; margin-top: 24px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .tip-card i { color: var(--accent); font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+    .tip-card .tip-title { font-size: .88rem; font-weight: 700; margin-bottom: 4px; }
+    .tip-card .tip-text { font-size: .82rem; color: var(--text-secondary); line-height: 1.6; }
+
+    .loading-state { text-align: center; color: var(--text-muted); padding: 80px 0; }
+    .loading-state i { font-size: 2rem; margin-bottom: 16px; display: block; color: var(--accent); }
+
+    @media (max-width: 768px) {
+      .page-wrap { padding: 0 16px 32px; }
+      .sim-hero { padding: 24px 20px; margin-top: 16px; }
+      .gpa-display { flex-direction: column; }
+      .sim-table { font-size: .82rem; }
+      .sim-table th, .sim-table td { padding: 8px 6px; }
+      .add-course-row { flex-direction: column; }
+    }
+  </style>
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="logo"><img src="/assets/logo.png" alt="UniVision" style="height:52px;width:auto;"></div>
+      <div class="nav-user"><span>Student</span><strong id="navName">—</strong></div>
+    </div>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-menu').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="home.html"><i class="fas fa-th-large"></i><span>Home</span></a></li>
+      <li class="nav-item"><a href="grades.html"><i class="fas fa-star"></i><span>Grades</span></a></li>
+      <li class="nav-item"><a href="attendance.html"><i class="fas fa-calendar-check"></i><span>Attendance</span></a></li>
+      <li class="nav-item"><a href="comparison.html"><i class="fas fa-balance-scale"></i><span>Performance</span></a></li>
+      <li class="nav-item"><a href="reports.html"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li>
+      <li class="nav-item"><a href="schedule.html"><i class="fas fa-clock"></i><span>Schedule</span></a></li>
+      <li class="nav-item"><a href="work.html"><i class="fas fa-briefcase"></i><span>Work</span></a></li>
+      <li class="nav-item active"><a href="simulator.html"><i class="fas fa-calculator"></i><span>Simulator</span></a></li>
+      <li class="nav-item"><a href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a></li>
+    </ul>
+    <div class="notif-bell" id="notifBell"><i class="fas fa-bell"></i><span class="notif-badge-count" id="notifCount" style="display:none;">0</span><div class="notif-dropdown" id="notifDropdown"></div></div>
+    <button id="logoutBtn" style="display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;color:var(--danger);border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);cursor:pointer;transition:all .2s;">
+      <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+    </button>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="sim-hero">
+      <h1><i class="fas fa-calculator" style="margin-right:8px;"></i> GPA Simulator</h1>
+      <p>Adjust your grades to see how they would affect your cumulative GPA. Add hypothetical courses or change existing grades to plan your academic path.</p>
+    </div>
+
+    <div id="loadingState" class="loading-state">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Loading your grades...</p>
+    </div>
+
+    <div id="content" style="display:none;">
+      <!-- GPA Display -->
+      <div class="gpa-display">
+        <div class="gpa-box">
+          <div class="gpa-label">Current GPA</div>
+          <div class="gpa-value current" id="currentGPA">—</div>
+        </div>
+        <div class="gpa-box" style="border-color:rgba(var(--accent-rgb),.2);">
+          <div class="gpa-label">Simulated GPA</div>
+          <div class="gpa-value simulated" id="simGPA">—</div>
+          <div class="gpa-change same" id="gpaChange"></div>
+        </div>
+        <div class="gpa-box">
+          <div class="gpa-label">Total Credits</div>
+          <div class="gpa-value current" id="totalCredits">—</div>
+        </div>
+      </div>
+
+      <!-- Simulator Table -->
+      <div class="sim-card">
+        <div class="sim-card-title"><i class="fas fa-sliders-h"></i> Adjust Grades</div>
+        <table class="sim-table">
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th style="text-align:center;">Credits</th>
+              <th style="text-align:center;">Current Grade</th>
+              <th style="text-align:center;">Simulated Grade</th>
+              <th style="text-align:center;">Impact</th>
+            </tr>
+          </thead>
+          <tbody id="simBody"></tbody>
+        </table>
+
+        <div class="sim-actions">
+          <button class="sim-btn reset" onclick="resetSimulation()"><i class="fas fa-undo"></i> Reset All</button>
+        </div>
+      </div>
+
+      <!-- Add Hypothetical Course -->
+      <div class="sim-card">
+        <div class="sim-card-title"><i class="fas fa-plus-circle"></i> Add Hypothetical Course</div>
+        <div class="add-course-row">
+          <div class="form-group" style="flex:2;">
+            <label>Course Name</label>
+            <input type="text" id="newCourseName" placeholder="e.g. Advanced Algorithms">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Credits</label>
+            <input type="number" id="newCourseCredits" value="3" min="1" max="6" style="width:70px;">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Expected Grade</label>
+            <select id="newCourseGrade">
+              <option value="A+">A+</option><option value="A">A</option><option value="A-">A-</option>
+              <option value="B+">B+</option><option value="B" selected>B</option><option value="B-">B-</option>
+              <option value="C+">C+</option><option value="C">C</option><option value="C-">C-</option>
+              <option value="D+">D+</option><option value="D">D</option><option value="D-">D-</option>
+              <option value="F">F</option>
+            </select>
+          </div>
+          <button class="add-course-btn" onclick="addHypothetical()"><i class="fas fa-plus"></i> Add</button>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="tip-card">
+        <i class="fas fa-lightbulb"></i>
+        <div>
+          <div class="tip-title">How GPA is Calculated</div>
+          <div class="tip-text">
+            GPA = Sum(Grade Points x Credits) / Total Credits. Each letter grade has a point value:
+            A+ = 4.0, A = 4.0, A- = 3.7, B+ = 3.3, B = 3.0, B- = 2.7, C+ = 2.3, C = 2.0, C- = 1.7, D+ = 1.3, D = 1.0, D- = 0.7, F = 0.0.
+            Use this simulator to find out what grades you need to reach your target GPA.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">Univision Student Portal</footer>
+
+  <script type="module">
+    import { Auth, StudentAPI } from '/js/student-api.js';
+    import { initNotifications } from '/js/notifications.js';
+    import { initChatbot } from '/js/chatbot.js';
+
+    const session = Auth.getSession();
+    if (!session.id || session.role !== 'student') { window.location.href = '/'; }
+    initNotifications(session.id);
+    initChatbot(session.id);
+    document.getElementById("navName").textContent = session.name || session.id;
+    document.getElementById("logoutBtn").addEventListener("click", () => Auth.logout());
+
+    const GRADE_POINTS = {
+      "A+":4.0,"A":4.0,"A-":3.7,"B+":3.3,"B":3.0,"B-":2.7,
+      "C+":2.3,"C":2.0,"C-":1.7,"D+":1.3,"D":1.0,"D-":0.7,"F":0.0
+    };
+    const GRADE_OPTIONS = Object.keys(GRADE_POINTS);
+
+    let courses = []; // { name, credits, currentGrade, simGrade, isHypothetical }
+    let currentGPA = 0;
+    let totalEarnedCredits = 0;
+
+    // Load data
+    try {
+      const [reports, gradesData] = await Promise.all([
+        StudentAPI.reports(session.id),
+        StudentAPI.grades(session.id),
+      ]);
+
+      // Get current semester courses from grades
+      const currentCourses = gradesData.subjects || [];
+
+      // Use the same currentGPA shown on the grades page (latest semester)
+      currentGPA = gradesData.currentGPA ?? 0;
+
+      // Total credits across all semesters
+      let totalCr = 0;
+      for (const sem of reports) {
+        totalCr += sem.credits;
+      }
+      totalEarnedCredits = totalCr;
+
+      // Current courses (from grades endpoint) — these are the ones we can simulate
+      for (const c of currentCourses) {
+        courses.push({
+          name: c.name,
+          credits: 3, // default
+          currentGrade: c.grade,
+          simGrade: c.grade,
+          isHypothetical: false,
+        });
+      }
+
+      document.getElementById("currentGPA").textContent = currentGPA.toFixed(2);
+      document.getElementById("totalCredits").textContent = totalEarnedCredits;
+
+      renderTable();
+      recalculate();
+
+      document.getElementById("loadingState").style.display = "none";
+      document.getElementById("content").style.display = "";
+
+      // Log activity
+      StudentAPI.logActivity(session.id, "Used GPA Simulator", null, "Simulator").catch(() => {});
+
+    } catch (e) {
+      console.error(e);
+      document.getElementById("loadingState").innerHTML = `
+        <i class="fas fa-exclamation-triangle" style="color:var(--danger);"></i>
+        <p>Failed to load data: ${e.message}</p>`;
+    }
+
+    function renderTable() {
+      const body = document.getElementById("simBody");
+      body.innerHTML = courses.map((c, i) => {
+        const gradeColor = getGradeColor(c.currentGrade);
+        return `
+          <tr>
+            <td class="course-name">${c.name}${c.isHypothetical ? ' <small style="color:var(--accent);font-weight:600;">(new)</small>' : ''}</td>
+            <td class="credits">${c.credits}</td>
+            <td class="current-grade" style="color:${gradeColor};">${c.isHypothetical ? '—' : c.currentGrade}</td>
+            <td style="text-align:center;">
+              <select onchange="updateGrade(${i}, this.value)">
+                ${GRADE_OPTIONS.map(g => `<option value="${g}" ${g === c.simGrade ? 'selected' : ''}>${g}</option>`).join('')}
+              </select>
+            </td>
+            <td class="impact" id="impact_${i}">—</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function getGradeColor(grade) {
+      if (!grade) return 'var(--text-muted)';
+      if (grade.startsWith('A')) return 'var(--success)';
+      if (grade.startsWith('B')) return 'var(--accent)';
+      if (grade.startsWith('C')) return 'var(--info)';
+      if (grade.startsWith('D')) return 'var(--warning)';
+      return 'var(--danger)';
+    }
+
+    window.updateGrade = function(idx, grade) {
+      courses[idx].simGrade = grade;
+      recalculate();
+    };
+
+    function recalculate() {
+      // Previous semesters contribute totalEarnedCredits * currentGPA points
+      let simPoints = totalEarnedCredits * currentGPA;
+      let simCredits = totalEarnedCredits;
+
+      // For existing courses: subtract old contribution, add new
+      // For hypothetical: just add
+      for (let i = 0; i < courses.length; i++) {
+        const c = courses[i];
+        const simPts = GRADE_POINTS[c.simGrade] ?? 0;
+
+        if (!c.isHypothetical) {
+          // Replace current grade impact with simulated
+          const curPts = GRADE_POINTS[c.currentGrade] ?? 0;
+          simPoints += (simPts - curPts) * c.credits;
+        } else {
+          simPoints += simPts * c.credits;
+          simCredits += c.credits;
+        }
+
+        // Show per-course impact
+        const impactEl = document.getElementById(`impact_${i}`);
+        if (impactEl) {
+          if (c.isHypothetical) {
+            impactEl.textContent = GRADE_POINTS[c.simGrade].toFixed(1) + " pts";
+            impactEl.className = "impact same";
+          } else {
+            const diff = GRADE_POINTS[c.simGrade] - GRADE_POINTS[c.currentGrade];
+            if (diff > 0) {
+              impactEl.textContent = "+" + diff.toFixed(1);
+              impactEl.className = "impact up";
+            } else if (diff < 0) {
+              impactEl.textContent = diff.toFixed(1);
+              impactEl.className = "impact down";
+            } else {
+              impactEl.textContent = "—";
+              impactEl.className = "impact same";
+            }
+          }
+        }
+      }
+
+      const simGPA = simCredits > 0 ? simPoints / simCredits : 0;
+      document.getElementById("simGPA").textContent = simGPA.toFixed(2);
+      document.getElementById("totalCredits").textContent = simCredits;
+
+      const diff = simGPA - currentGPA;
+      const changeEl = document.getElementById("gpaChange");
+      if (Math.abs(diff) < 0.005) {
+        changeEl.textContent = "No change";
+        changeEl.className = "gpa-change same";
+      } else if (diff > 0) {
+        changeEl.textContent = "+" + diff.toFixed(2) + " from current";
+        changeEl.className = "gpa-change up";
+      } else {
+        changeEl.textContent = diff.toFixed(2) + " from current";
+        changeEl.className = "gpa-change down";
+      }
+    }
+
+    window.addHypothetical = function() {
+      const name = document.getElementById("newCourseName").value.trim();
+      const credits = parseInt(document.getElementById("newCourseCredits").value) || 3;
+      const grade = document.getElementById("newCourseGrade").value;
+      if (!name) return;
+
+      courses.push({
+        name, credits,
+        currentGrade: null,
+        simGrade: grade,
+        isHypothetical: true,
+      });
+
+      document.getElementById("newCourseName").value = "";
+      renderTable();
+      recalculate();
+    };
+
+    window.resetSimulation = function() {
+      courses = courses.filter(c => !c.isHypothetical);
+      courses.forEach(c => { c.simGrade = c.currentGrade; });
+      renderTable();
+      recalculate();
+    };
+  </script>
+</body>
+</html>

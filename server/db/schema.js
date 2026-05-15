@@ -128,6 +128,40 @@ function createSchema() {
       read_at         TEXT    NOT NULL DEFAULT (datetime('now')),
       PRIMARY KEY (notification_id, student_id)
     );
+    CREATE TABLE IF NOT EXISTS cv_data (
+      student_id  TEXT PRIMARY KEY REFERENCES users(id),
+      data        TEXT NOT NULL DEFAULT '{}',
+      updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS exams (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      semester    INTEGER NOT NULL,
+      course_name TEXT    NOT NULL,
+      exam_type   TEXT    NOT NULL DEFAULT 'Final' CHECK(exam_type IN ('Midterm','Final','Quiz','Practical')),
+      exam_date   TEXT    NOT NULL,
+      start_time  TEXT,
+      end_time    TEXT,
+      location    TEXT,
+      notes       TEXT
+    );
+    CREATE TABLE IF NOT EXISTS course_materials (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      course_name TEXT    NOT NULL,
+      doctor_id   TEXT    NOT NULL REFERENCES users(id),
+      title       TEXT    NOT NULL,
+      type        TEXT    NOT NULL DEFAULT 'link' CHECK(type IN ('link','pdf','video','document','other')),
+      url         TEXT    NOT NULL,
+      description TEXT,
+      created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS activity_log (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      student_id  TEXT    NOT NULL REFERENCES users(id),
+      action      TEXT    NOT NULL,
+      detail      TEXT,
+      page        TEXT,
+      created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+    );
   `);
   // Migration: add grade column to existing databases
   try { db.exec("ALTER TABLE student_profiles ADD COLUMN grade INTEGER NOT NULL DEFAULT 1"); } catch {}

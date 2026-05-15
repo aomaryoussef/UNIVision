@@ -108,6 +108,36 @@ function seed() {
     "أداء جيد في الكويزات، لكن محتاج تركز أكتر في الـ Critical Path Method. حاول تراجع المحاضرة الخامسة قبل الفاينال.",0);
   console.log("✓ Feedback seeded");
 
+  // Exams — upcoming exam dates for semester 4 courses
+  const insExam = db.prepare(
+    "INSERT OR IGNORE INTO exams (semester,course_name,exam_type,exam_date,start_time,end_time,location,notes) VALUES (?,?,?,?,?,?,?,?)"
+  );
+  const futureDate = (days) => { const d = new Date(); d.setDate(d.getDate() + days); return d.toISOString().slice(0,10); };
+  insExam.run(4, "Human Resources",    "Final",     futureDate(12), "09:00","11:00","Hall A","Chapters 1-8, open book");
+  insExam.run(4, "Marketing",          "Final",     futureDate(15), "10:00","12:00","Hall B","All chapters, MCQ + essay");
+  insExam.run(4, "Statistics",          "Final",     futureDate(18), "09:00","11:00","Hall C","Calculator allowed");
+  insExam.run(4, "Project Management",  "Final",     futureDate(22), "11:00","13:00","Hall A","Case study based");
+  insExam.run(4, "Economics",           "Final",     futureDate(25), "09:00","11:30","Hall D","Chapters 5-12");
+  insExam.run(4, "Marketing",           "Quiz",      futureDate(3),  "10:00","10:30","Room 201","Quick quiz on Ch.7");
+  insExam.run(4, "Statistics",           "Practical", futureDate(5),  "14:00","16:00","Lab 3","SPSS practical exam");
+  console.log("✓ Exams seeded");
+
+  // Course Materials
+  const insMat = db.prepare(
+    "INSERT OR IGNORE INTO course_materials (course_name,doctor_id,title,type,url,description,created_at) VALUES (?,?,?,?,?,?,?)"
+  );
+  insMat.run("Human Resources",   DID,"HR Chapter 1-4 Slides","pdf","https://example.com/hr-slides.pdf","Covering recruitment, selection, and training",ago(10));
+  insMat.run("Human Resources",   DID,"HR Case Studies","document","https://example.com/hr-cases.docx","Real-world HR scenarios for discussion",ago(7));
+  insMat.run("Marketing",         DID,"Marketing Fundamentals Video","video","https://www.youtube.com/watch?v=dQw4w9WgXcQ","Introduction to the 4Ps of Marketing",ago(14));
+  insMat.run("Marketing",         DID,"Digital Marketing Guide","link","https://example.com/digital-marketing","Comprehensive guide to online marketing strategies",ago(5));
+  insMat.run("Statistics",         DID,"SPSS Tutorial","video","https://www.youtube.com/watch?v=example","Step-by-step SPSS guide for assignments",ago(8));
+  insMat.run("Statistics",         DID,"Stats Formula Sheet","pdf","https://example.com/stats-formulas.pdf","All formulas needed for the final exam",ago(3));
+  insMat.run("Project Management", DID,"PM Lecture Notes","pdf","https://example.com/pm-notes.pdf","Covers CPM, PERT, and Gantt charts",ago(12));
+  insMat.run("Project Management", DID,"Gantt Chart Template","document","https://example.com/gantt-template.xlsx","Excel template for project planning",ago(6));
+  insMat.run("Economics",          DID,"Microeconomics Textbook Ch.5-8","pdf","https://example.com/econ-ch5-8.pdf","Supply, demand, and market equilibrium",ago(15));
+  insMat.run("Economics",          DID,"Khan Academy Economics","link","https://www.khanacademy.org/economics-finance-domain","Free economics video lessons",ago(9));
+  console.log("✓ Course materials seeded");
+
   console.log(`
 ╔══════════════════════════════════════════════════════╗
 ║           UNIVISION — LOGIN CREDENTIALS              ║

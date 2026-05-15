@@ -164,4 +164,28 @@ router.delete("/admin-feedback/:id", (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Exams CRUD ──────────────────────────────────────────────
+router.get("/exams/:semester", (req, res) => {
+  res.json(getDb().prepare("SELECT * FROM exams WHERE semester=? ORDER BY exam_date ASC, start_time ASC").all(Number(req.params.semester)));
+});
+router.post("/exams/:semester", (req, res) => {
+  const { course_name, exam_type, exam_date, start_time, end_time, location, notes } = req.body;
+  const r = getDb().prepare("INSERT INTO exams (semester,course_name,exam_type,exam_date,start_time,end_time,location,notes) VALUES (?,?,?,?,?,?,?,?)")
+    .run(Number(req.params.semester), course_name, exam_type||'Final', exam_date, start_time||null, end_time||null, location||null, notes||null);
+  res.status(201).json({ ok: true, id: r.lastInsertRowid });
+});
+router.delete("/exam/:id", (req, res) => { getDb().prepare("DELETE FROM exams WHERE id=?").run(req.params.id); res.json({ ok: true }); });
+
+// ── Course Materials CRUD ───────────────────────────────────
+router.get("/materials", (req, res) => {
+  res.json(getDb().prepare("SELECT cm.*, u.name AS doctor_name FROM course_materials cm LEFT JOIN users u ON u.id=cm.doctor_id ORDER BY cm.created_at DESC").all());
+});
+router.post("/materials", (req, res) => {
+  const { course_name, title, type, url, description } = req.body;
+  const r = getDb().prepare("INSERT INTO course_materials (course_name,doctor_id,title,type,url,description) VALUES (?,?,?,?,?,?)")
+    .run(course_name, req.user.id, title, type||'link', url, description||null);
+  res.status(201).json({ ok: true, id: r.lastInsertRowid });
+});
+router.delete("/material/:id", (req, res) => { getDb().prepare("DELETE FROM course_materials WHERE id=?").run(req.params.id); res.json({ ok: true }); });
+
 module.exports = router;

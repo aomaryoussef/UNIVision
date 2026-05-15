@@ -310,4 +310,30 @@
   }
 
   init();
+
+  // ── PWA: Register Service Worker + inject manifest ──
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }
+  // Inject manifest link if not present
+  if (!document.querySelector('link[rel="manifest"]')) {
+    const link = document.createElement("link");
+    link.rel = "manifest";
+    link.href = "/manifest.json";
+    document.head.appendChild(link);
+  }
+  // Inject theme-color meta
+  if (!document.querySelector('meta[name="theme-color"]')) {
+    const meta = document.createElement("meta");
+    meta.name = "theme-color";
+    meta.content = "#d4a830";
+    document.head.appendChild(meta);
+  }
+  // Inject apple-touch-icon
+  if (!document.querySelector('link[rel="apple-touch-icon"]')) {
+    const link = document.createElement("link");
+    link.rel = "apple-touch-icon";
+    link.href = "/assets/logo.png";
+    document.head.appendChild(link);
+  }
 })();

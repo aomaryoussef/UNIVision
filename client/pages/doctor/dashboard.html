@@ -250,6 +250,9 @@
       <li class="nav-item" id="navItemSchedule">
         <a href="#" id="navScheduleLink"><i class="fas fa-clock"></i><span>Schedule</span></a>
       </li>
+      <li class="nav-item" id="navItemMaterials">
+        <a href="#" id="navMaterialsLink"><i class="fas fa-book-open"></i><span>Materials</span></a>
+      </li>
       <li class="nav-item" id="navItemNotifications" style="display:none;">
         <a href="#" id="navNotificationsLink"><i class="fas fa-bell"></i><span>Notifications</span></a>
       </li>
@@ -472,6 +475,64 @@
 
   <!-- ── Toast ─────────────────────────────────────────── -->
   <div id="toast"></div>
+
+  <!-- ── Materials Section ─────────────────────────────── -->
+  <div id="materialsSection" style="display:none;margin-top:var(--nav-h);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;max-width:1100px;margin-left:auto;margin-right:auto;padding:32px 32px 0;">
+      <h2 style="font-size:1.4rem;font-weight:800;"><i class="fas fa-book-open" style="color:var(--accent);margin-right:10px;"></i>Course Materials Management</h2>
+      <button class="btn btn-accent" id="matAddBtn"><i class="fas fa-plus"></i> Add Material</button>
+    </div>
+
+    <div style="max-width:1100px;margin:0 auto;padding:0 32px 32px;">
+      <!-- Create form -->
+      <div class="form-card" id="matForm">
+        <h4><i class="fas fa-upload" style="margin-right:8px;"></i>Add Course Material</h4>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Course Name <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="mat_course" placeholder="e.g. Human Resources">
+          </div>
+          <div class="form-group">
+            <label>Title <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="mat_title" placeholder="e.g. Chapter 1 Slides">
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select id="mat_type">
+              <option value="pdf">PDF</option>
+              <option value="video">Video</option>
+              <option value="link" selected>Link</option>
+              <option value="document">Document</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>URL <span style="color:var(--danger)">*</span></label>
+            <input type="url" id="mat_url" placeholder="https://example.com/resource.pdf">
+          </div>
+          <div class="form-group full">
+            <label>Description</label>
+            <textarea id="mat_desc" placeholder="Brief description of this material..." rows="2"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-accent" id="matSaveBtn"><i class="fas fa-save"></i> Save</button>
+          <button class="btn btn-ghost" id="matCancelBtn">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Filter by course -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="matFilterWrap"></div>
+
+      <!-- Materials list -->
+      <div id="matList"></div>
+
+      <div id="matEmpty" class="empty-state" style="display:none;">
+        <i class="fas fa-folder-open"></i>
+        <p>No course materials uploaded yet. Click "Add Material" to upload one.</p>
+      </div>
+    </div>
+  </div>
 
   <!-- ── Notifications Section (admin only) ────────────── -->
   <div id="notificationsSection" style="display:none;margin-top:var(--nav-h);">
@@ -1360,17 +1421,22 @@
       const dashboard  = document.querySelector(".dashboard");
       const scSection  = document.getElementById("scheduleSection");
       const ntSection  = document.getElementById("notificationsSection");
+      const mtSection  = document.getElementById("materialsSection");
       document.getElementById("navItemDashboard").classList.toggle("active", view === "dashboard");
       document.getElementById("navItemSchedule").classList.toggle("active", view === "schedule");
+      document.getElementById("navItemMaterials").classList.toggle("active", view === "materials");
       document.getElementById("navItemNotifications")?.classList.toggle("active", view === "notifications");
       dashboard.style.display   = view === "dashboard"     ? "" : "none";
       scSection.style.display   = view === "schedule"      ? "block" : "none";
       ntSection.style.display   = view === "notifications" ? "block" : "none";
+      mtSection.style.display   = view === "materials"     ? "block" : "none";
       if (view === "schedule") initScheduleSection();
       if (view === "notifications") initNotificationsSection();
+      if (view === "materials") initMaterialsSection();
     }
     document.getElementById("navDashboardLink").addEventListener("click", e => { e.preventDefault(); showView("dashboard"); });
     document.getElementById("navScheduleLink").addEventListener("click", e => { e.preventDefault(); showView("schedule"); });
+    document.getElementById("navMaterialsLink").addEventListener("click", e => { e.preventDefault(); showView("materials"); });
     document.getElementById("navNotificationsLink")?.addEventListener("click", e => { e.preventDefault(); showView("notifications"); });
 
     // Show notifications nav item for admins
@@ -1671,6 +1737,162 @@
         await DoctorAPI.deleteNotification(id);
         toast("Notification deleted");
         refreshNotifications();
+      } catch(e) { toast(e.message, "err"); }
+    };
+
+    // ── Materials Section ────────────────────────────────────
+    let _matInited = false;
+    let _matAll = [];
+    let _matFilter = "all";
+    const MAT_TYPE_ICONS = { pdf:"fa-file-pdf", video:"fa-play-circle", link:"fa-external-link-alt", document:"fa-file-word", other:"fa-file" };
+    const MAT_TYPE_COLORS = { pdf:"#ef4444", video:"#ef4444", link:"var(--accent)", document:"#3b82f6", other:"#a855f7" };
+
+    async function initMaterialsSection() {
+      if (_matInited) { refreshMaterials(); return; }
+      _matInited = true;
+
+      document.getElementById("matAddBtn").addEventListener("click", () => {
+        const form = document.getElementById("matForm");
+        form.classList.toggle("open");
+      });
+      document.getElementById("matCancelBtn").addEventListener("click", () => {
+        document.getElementById("matForm").classList.remove("open");
+        clearMatForm();
+      });
+      document.getElementById("matSaveBtn").addEventListener("click", async () => {
+        const data = {
+          course_name: document.getElementById("mat_course").value.trim(),
+          title:       document.getElementById("mat_title").value.trim(),
+          type:        document.getElementById("mat_type").value,
+          url:         document.getElementById("mat_url").value.trim(),
+          description: document.getElementById("mat_desc").value.trim(),
+        };
+        if (!data.course_name) return toast("Course name is required", "err");
+        if (!data.title)       return toast("Title is required", "err");
+        if (!data.url)         return toast("URL is required", "err");
+        try {
+          await DoctorAPI.addMaterial(data);
+          toast("Material added successfully!");
+          document.getElementById("matForm").classList.remove("open");
+          clearMatForm();
+          refreshMaterials();
+        } catch(e) { toast(e.message, "err"); }
+      });
+
+      document.getElementById("matFilterWrap").addEventListener("click", e => {
+        const pill = e.target.closest(".gf-pill");
+        if (!pill) return;
+        _matFilter = pill.dataset.course;
+        document.querySelectorAll("#matFilterWrap .gf-pill").forEach(p =>
+          p.classList.toggle("active", p === pill)
+        );
+        renderMaterials();
+      });
+
+      refreshMaterials();
+    }
+
+    function clearMatForm() {
+      ["mat_course","mat_title","mat_url","mat_desc"].forEach(id => document.getElementById(id).value = "");
+      document.getElementById("mat_type").value = "link";
+    }
+
+    async function refreshMaterials() {
+      try {
+        _matAll = await DoctorAPI.getMaterials();
+        const list = document.getElementById("matList");
+        const empty = document.getElementById("matEmpty");
+        const filterWrap = document.getElementById("matFilterWrap");
+
+        if (!_matAll.length) {
+          list.innerHTML = "";
+          filterWrap.innerHTML = "";
+          empty.style.display = "";
+          return;
+        }
+        empty.style.display = "none";
+
+        // Build filter pills
+        const courses = [...new Set(_matAll.map(m => m.course_name))].sort();
+        filterWrap.innerHTML =
+          `<button class="gf-pill ${_matFilter === 'all' ? 'active' : ''}" data-course="all">All (${_matAll.length})</button>` +
+          courses.map(c => {
+            const count = _matAll.filter(m => m.course_name === c).length;
+            return `<button class="gf-pill ${_matFilter === c ? 'active' : ''}" data-course="${c}">${c} (${count})</button>`;
+          }).join("");
+
+        renderMaterials();
+      } catch(e) { toast("Failed to load materials", "err"); }
+    }
+
+    function renderMaterials() {
+      const filtered = _matFilter === "all" ? _matAll : _matAll.filter(m => m.course_name === _matFilter);
+      const list = document.getElementById("matList");
+
+      if (!filtered.length) {
+        list.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px;font-size:.88rem;">No materials for this filter.</div>`;
+        return;
+      }
+
+      // Group by course
+      const grouped = {};
+      filtered.forEach(m => {
+        if (!grouped[m.course_name]) grouped[m.course_name] = [];
+        grouped[m.course_name].push(m);
+      });
+
+      let html = "";
+      for (const [course, items] of Object.entries(grouped)) {
+        html += `
+          <div style="margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid rgba(var(--accent-rgb),.12);">
+              <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.15),rgba(var(--accent-rgb),.05));display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:.85rem;">
+                <i class="fas fa-book"></i>
+              </div>
+              <span style="font-size:1rem;font-weight:800;">${course}</span>
+              <span style="margin-left:auto;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:99px;background:rgba(var(--accent-rgb),.08);color:var(--accent);">${items.length} item${items.length > 1 ? 's' : ''}</span>
+            </div>`;
+
+        for (const m of items) {
+          const icon = MAT_TYPE_ICONS[m.type] || "fa-file";
+          const color = MAT_TYPE_COLORS[m.type] || "var(--text-muted)";
+          const date = new Date(m.created_at + "Z").toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+          html += `
+            <div class="card" style="margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;">
+              <div style="width:42px;height:42px;border-radius:10px;background:rgba(${m.type === 'pdf' || m.type === 'video' ? '239,68,68' : m.type === 'document' ? '59,130,246' : m.type === 'other' ? '168,85,247' : 'var(--accent-rgb)'},.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${color};font-size:1.1rem;">
+                <i class="fas ${icon}"></i>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <div>
+                    <strong style="font-size:.92rem;">${m.title}</strong>
+                    <span class="badge badge-accent" style="margin-left:8px;font-size:.6rem;text-transform:uppercase;">${m.type}</span>
+                  </div>
+                  <button onclick="deleteMat(${m.id})" class="btn btn-danger" style="padding:5px 10px;font-size:.72rem;">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+                ${m.description ? `<p style="font-size:.82rem;color:var(--text-secondary);margin-top:4px;line-height:1.5;">${m.description}</p>` : ''}
+                <div style="font-size:.72rem;color:var(--text-muted);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;">
+                  <span><i class="fas fa-user-tie" style="margin-right:3px;"></i>${m.doctor_name || 'Unknown'}</span>
+                  <span><i class="fas fa-calendar" style="margin-right:3px;"></i>${date}</span>
+                  <a href="${m.url}" target="_blank" style="color:var(--accent);text-decoration:none;"><i class="fas fa-external-link-alt" style="margin-right:3px;"></i>Open</a>
+                </div>
+              </div>
+            </div>`;
+        }
+        html += `</div>`;
+      }
+
+      list.innerHTML = html;
+    }
+
+    window.deleteMat = async (id) => {
+      if (!confirm("Delete this material?")) return;
+      try {
+        await DoctorAPI.deleteMaterial(id);
+        toast("Material deleted");
+        refreshMaterials();
       } catch(e) { toast(e.message, "err"); }
     };
   </script>

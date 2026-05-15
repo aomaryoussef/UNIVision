@@ -72,4 +72,27 @@ export const StudentAPI = {
     method: "POST",
     body: JSON.stringify({ messages }),
   }),
+
+  // CV Builder
+  getCV:  (sid) => apiFetch(`/student/${sid}/cv`),
+  saveCV: (sid, data) => apiFetch(`/student/${sid}/cv`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  }),
+
+  // Exams
+  exams: (sid) => apiFetch(`/student/${sid}/exams`),
+
+  // Course Materials
+  materials: (sid) => apiFetch(`/student/${sid}/materials`),
+
+  // Activity Log
+  activity:   (sid) => apiFetch(`/student/${sid}/activity`),
+  logActivity:(sid, action, detail, page) => apiFetch(`/student/${sid}/activity`, {
+    method: "POST",
+    body: JSON.stringify({ action, detail, page }),
+  }),
+
+  // GPA Simulator (uses existing grades data)
+  // No separate endpoint needed — uses grades() data
 };
