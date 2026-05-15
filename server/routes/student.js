@@ -206,7 +206,7 @@ router.get("/:studentId/comparison", (req, res) => {
   const gpaTrend = mySemesters.map(s => {
     const peerGPAs = peers.map(p => db.prepare("SELECT gpa FROM semesters WHERE student_id=? AND semester_number=?").get(p, s.semester_number)?.gpa).filter(g => g != null);
     const classAvg = peerGPAs.length ? +(peerGPAs.reduce((a,b) => a+b, 0) / peerGPAs.length).toFixed(2) : 0;
-    return { semester: s.label, myGPA: s.gpa, classAvg };
+    return { semester: s.label, semester_number: s.semester_number, myGPA: s.gpa, classAvg };
   });
 
   // 3. Attendance comparison

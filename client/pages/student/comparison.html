@@ -462,6 +462,17 @@
     document.getElementById("navName").textContent = session.name || session.id;
     document.getElementById("logoutBtn").addEventListener("click", () => Auth.logout());
 
+    /* ── Helpers (same as home dashboard) ─────────── */
+    function ordinal(n) {
+      const s = ["th","st","nd","rd"], v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    }
+    function trendLabel(t) {
+      const yearMatch = t.semester && t.semester.match(/(\d{4})/);
+      const year = yearMatch ? " '" + yearMatch[1].slice(2) : "";
+      return ordinal(t.semester_number) + year;
+    }
+
     const sid = session.id;
 
     try {
@@ -539,7 +550,7 @@
       new Chart(document.getElementById("gpaTrendChart").getContext("2d"), {
         type: "line",
         data: {
-          labels: data.gpaTrend.map(t => t.semester),
+          labels: data.gpaTrend.map(t => trendLabel(t)),
           datasets: [
             {
               label: "Your GPA",
