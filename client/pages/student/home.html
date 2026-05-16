@@ -503,19 +503,26 @@
       </div>
 
       </div>
-    </div>
 
-    <!-- ═══ University Resources ═══ -->
-    <div class="card" style="margin-top:28px;margin-bottom:20px;">
-      <div class="card-title"><i class="fas fa-university"></i> University Resources</div>
-      <div class="resources-grid">
-        <a class="nav-card" href="https://sis.eelu.edu.eg/static/index.html" target="_blank" style="border-color:rgba(74,222,128,.2);"><i class="fas fa-laptop-code" style="color:var(--success);"></i><span>E-Learning<br><small style="font-weight:400;color:var(--text-muted);">Lectures & Materials</small></span></a>
-        <a class="nav-card" href="https://eelu.edu.eg" target="_blank" style="border-color:rgba(var(--accent-rgb),.2);"><i class="fas fa-university" style="color:var(--accent);"></i><span>Main Portal<br><small style="font-weight:400;color:var(--text-muted);">Official Website</small></span></a>
-        <a class="nav-card" href="https://www.eelu.edu.eg/Student-Services-Unit" target="_blank" style="border-color:rgba(239,68,68,.2);"><i class="fas fa-comment-dots" style="color:var(--danger);"></i><span>Complaints<br><small style="font-weight:400;color:var(--text-muted);">Student Support</small></span></a>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-university"></i> University Resources</div>
+        <div class="resources-grid">
+          <a class="nav-card" href="https://sis.eelu.edu.eg/static/index.html" target="_blank" style="border-color:rgba(74,222,128,.2);"><i class="fas fa-laptop-code" style="color:var(--success);"></i><span>E-Learning<br><small style="font-weight:400;color:var(--text-muted);">Lectures & Materials</small></span></a>
+          <a class="nav-card" href="https://eelu.edu.eg" target="_blank" style="border-color:rgba(var(--accent-rgb),.2);"><i class="fas fa-university" style="color:var(--accent);"></i><span>Main Portal<br><small style="font-weight:400;color:var(--text-muted);">Official Website</small></span></a>
+          <a class="nav-card" href="https://www.eelu.edu.eg/Student-Services-Unit" target="_blank" style="border-color:rgba(239,68,68,.2);"><i class="fas fa-comment-dots" style="color:var(--danger);"></i><span>Complaints<br><small style="font-weight:400;color:var(--text-muted);">Student Support</small></span></a>
+        </div>
       </div>
     </div>
 
   </div>
+
+  <footer class="footer">
+    <div class="footer-social">
+      <a class="fb" href="https://www.facebook.com/share/1Hu8kg7tb1/?mibextid=wwXIfr" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a class="ig" href="https://www.instagram.com/uni.vision.1?igsh=MWE2YXpuNmdrbHNsZQ==" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+    </div>
+    &copy; 2026 UniVision. All rights reserved.
+  </footer>
 
   <script type="module">
     import { Auth, StudentAPI } from "/js/student-api.js";
@@ -694,25 +701,6 @@
         `).join("");
       }
 
-      // ── Recent Notifications ──
-      const notifs = data.recentNotifications || [];
-      const nEl = document.getElementById("recentNotifs");
-      const NOTIF_ICONS = { day_off: "fa-calendar-xmark", lecture_cancelled: "fa-ban", event: "fa-calendar-star", holiday: "fa-umbrella-beach", exam: "fa-file-pen", general: "fa-bullhorn" };
-      if (notifs.length) {
-        nEl.innerHTML = notifs.map(n => {
-          const ago = timeAgo(n.created_at);
-          return `
-            <div class="notif-item-home">
-              <div class="notif-icon-home"><i class="fas ${NOTIF_ICONS[n.category] || 'fa-bullhorn'}"></i></div>
-              <div>
-                <div class="notif-title-home">${n.title}</div>
-                <div class="notif-body-home">${n.body}</div>
-                <div class="notif-time-home">${ago}</div>
-              </div>
-            </div>`;
-        }).join("");
-      }
-
       // ── GPA History ──
       const history = data.gpaHistory || [];
       const histEl = document.getElementById("gpaHistory");
@@ -811,21 +799,6 @@
               <span class="exam-type-badge ${typeClass}">${ex.exam_type}</span>
             </div>`;
         }).join("");
-      }
-
-      // ── Activity Log ──
-      const activities = data.recentActivity || [];
-      const actEl = document.getElementById("activityLog");
-      if (activities.length) {
-        actEl.innerHTML = activities.map(a => `
-          <div class="activity-item">
-            <div class="activity-dot"></div>
-            <div>
-              <div class="activity-text"><strong>${a.action}</strong>${a.detail ? ' — ' + a.detail : ''}</div>
-              <div class="activity-time">${timeAgo(a.created_at)}${a.page ? ' · ' + a.page : ''}</div>
-            </div>
-          </div>
-        `).join("");
       }
 
       // Log this page visit

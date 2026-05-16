@@ -358,11 +358,32 @@ input, select { font-family: inherit; }
 
 .footer {
   text-align: center;
-  padding: 20px;
+  padding: 24px 20px;
   font-size: 0.78rem;
   color: var(--text-muted);
   border-top: 1px solid var(--border);
 }
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.footer-social a {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: transform .2s, border-color .2s, color .2s, background .2s;
+}
+.footer-social a:hover {
+  transform: translateY(-2px);
+}
+.footer-social a.fb:hover  { background: rgba(24,119,242,.12); border-color: rgba(24,119,242,.35); color: #4e9af1; }
+.footer-social a.ig:hover  { background: rgba(225,48,108,.12); border-color: rgba(225,48,108,.35); color: #e1306c; }
 
 /* ── Animations ─────────────────────────────────────────── */
 @keyframes fadeUp {
