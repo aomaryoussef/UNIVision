@@ -352,13 +352,6 @@ input, select { font-family: inherit; }
   box-shadow: 0 8px 24px rgba(0,0,0,.15);
 }
 .resources-grid .nav-card i { font-size: 1.3rem; flex-shrink: 0; }
-@media (max-width: 768px) {
-  .resources-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 480px) {
-  .resources-grid { grid-template-columns: 1fr; }
-  .resources-grid .nav-card { padding: 14px; font-size: 0.84rem; }
-}
 
 .footer {
   text-align: center;
