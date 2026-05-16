@@ -334,8 +334,8 @@ input, select { font-family: inherit; }
 /* ── University Resources Grid ─────────────────────────── */
 .resources-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 .resources-grid .nav-card {
   display: flex; align-items: center; gap: 12px;
@@ -352,6 +352,9 @@ input, select { font-family: inherit; }
   box-shadow: 0 8px 24px rgba(0,0,0,.15);
 }
 .resources-grid .nav-card i { font-size: 1.3rem; flex-shrink: 0; }
+@media (max-width: 480px) {
+  .resources-grid { grid-template-columns: 1fr; }
+}
 
 .footer {
   text-align: center;
