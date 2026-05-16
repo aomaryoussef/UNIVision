@@ -97,16 +97,19 @@
   <div class="toc-item"><span>3. Technology Stack & Justification</span><span>5</span></div>
   <div class="toc-item"><span>4. System Architecture</span><span>7</span></div>
   <div class="toc-item"><span>5. Features — Student Portal</span><span>8</span></div>
-  <div class="toc-item"><span>6. Features — Doctor/Admin Dashboard</span><span>12</span></div>
-  <div class="toc-item"><span>7. Theme & Customization System</span><span>14</span></div>
-  <div class="toc-item"><span>8. Smart Performance Alert System</span><span>15</span></div>
-  <div class="toc-item"><span>9. Performance Comparison Engine</span><span>16</span></div>
-  <div class="toc-item"><span>10. Database Design</span><span>17</span></div>
-  <div class="toc-item"><span>11. API Reference</span><span>18</span></div>
-  <div class="toc-item"><span>12. Security & Authentication</span><span>19</span></div>
-  <div class="toc-item"><span>13. Project Structure</span><span>20</span></div>
-  <div class="toc-item"><span>14. Setup & Deployment Guide</span><span>21</span></div>
-  <div class="toc-item"><span>15. Future Enhancements</span><span>22</span></div>
+  <div class="toc-item"><span>6. Features — Doctor/Admin Dashboard</span><span>14</span></div>
+  <div class="toc-item"><span>7. Theme & Customization System</span><span>17</span></div>
+  <div class="toc-item"><span>8. Smart Performance Alert System</span><span>18</span></div>
+  <div class="toc-item"><span>9. Performance Comparison Engine</span><span>19</span></div>
+  <div class="toc-item"><span>10. Database Design</span><span>20</span></div>
+  <div class="toc-item"><span>11. API Reference</span><span>22</span></div>
+  <div class="toc-item"><span>12. Security & Authentication</span><span>24</span></div>
+  <div class="toc-item"><span>13. Project Structure</span><span>25</span></div>
+  <div class="toc-item"><span>14. Setup & Deployment Guide</span><span>26</span></div>
+  <div class="toc-item"><span>15. AI Chatbot — UniBot</span><span>28</span></div>
+  <div class="toc-item"><span>16. Progressive Web App (PWA)</span><span>30</span></div>
+  <div class="toc-item"><span>17. Notification System</span><span>31</span></div>
+  <div class="toc-item"><span>18. Future Enhancements</span><span>32</span></div>
 </div>
 
 <!-- ════════════════════════════════════════════ 1. OVERVIEW ═════ -->
@@ -302,7 +305,7 @@
 <div class="section">
   <h2>5. Features — Student Portal</h2>
 
-  <p>The student portal provides 7 dedicated pages, each designed to address a specific academic need. Below is a detailed breakdown of each feature, its purpose, and its benefits.</p>
+  <p>The student portal provides 10 dedicated pages, each designed to address a specific academic need. Below is a detailed breakdown of each feature, its purpose, and its benefits.</p>
 
   <h3>5.1 Home Dashboard</h3>
   <div class="feature-grid">
@@ -424,6 +427,68 @@
 
   <h3>5.7 Performance Comparison Page</h3>
   <p>See Section 9 for detailed coverage of this advanced analytics feature.</p>
+
+  <h3>5.8 CV Builder</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Job Platform Links</h4>
+      <p>7 cards linking to LinkedIn, Indeed, Wuzzuf, Forasna, Jobzella, Tanqeeb, and Bayt.</p>
+      <p class="why">Why: Students often don't know where to start job hunting. Curated links reduce friction.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Multi-Section CV Form</h4>
+      <p>Personal Info, Professional Summary, Education, Work Experience, Skills (tag input), Projects, Certifications, and Languages — each with add/remove support for multiple entries.</p>
+      <p class="why">Why: A structured form ensures students don't miss important sections and produces a complete, professional CV.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Live ATS Preview</h4>
+      <p>Real-time preview of the CV in a clean, ATS-friendly format that updates as the student types.</p>
+      <p class="why">Why: WYSIWYG editing lets students see exactly how their CV will appear to recruiters.</p>
+    </div>
+    <div class="feature-card">
+      <h4>PDF Export & Server Persistence</h4>
+      <p>One-click PDF download via browser print. CV data is saved as a JSON blob to the database so it persists across sessions.</p>
+      <p class="why">Why: Students need a downloadable file, and saving progress prevents data loss between sessions.</p>
+    </div>
+  </div>
+
+  <h3>5.9 GPA Simulator</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>What-If Calculator</h4>
+      <p>Per-course dropdowns let students select hypothetical final grades. Additional hypothetical courses can be added with custom credit hours.</p>
+      <p class="why">Why: Students anxious about their GPA can model different scenarios to set realistic goals.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Real-Time Simulation</h4>
+      <p>Simulated GPA updates instantly as grades are changed. Side-by-side comparison shows current vs. simulated GPA.</p>
+      <p class="why">Why: Immediate feedback makes the tool interactive and engaging rather than a static calculator.</p>
+    </div>
+  </div>
+
+  <h3>5.10 Course Materials</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Grouped Resource Browser</h4>
+      <p>Materials organized under course headers with filter tabs (All, Links, PDFs, Videos, Documents).</p>
+      <p class="why">Why: Centralized access to learning materials eliminates hunting through emails and LMS folders.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Material Cards</h4>
+      <p>Each card shows title, type icon, description, doctor name, upload date, and a direct link to open the resource in a new tab.</p>
+      <p class="why">Why: Rich metadata helps students quickly identify the most relevant materials.</p>
+    </div>
+  </div>
+
+  <h3>5.11 Exam Countdown</h3>
+  <p>
+    The home dashboard includes an <strong>Upcoming Exams</strong> section with live countdown timers. Exams within 3 days show a <span class="badge badge-gold" style="background:#fee2e2;color:#991b1b;">red urgency</span> badge, those within 7 days show <span class="badge badge-gold">yellow warning</span>, helping students prioritize preparation.
+  </p>
+
+  <h3>5.12 University Resources</h3>
+  <p>
+    Three quick-link cards on the home dashboard provide direct access to EELU's <strong>E-Learning Portal</strong>, <strong>Main University Website</strong>, and <strong>Student Support</strong> services — each with a descriptive subtitle and external link icon.
+  </p>
 </div>
 
 <!-- ═══════════════════════════════════════ 6. DOCTOR FEATURES ═══ -->
@@ -488,6 +553,30 @@
   <h3>6.5 Schedule Management</h3>
   <p>
     A separate top-level view for managing class schedules. Doctors select a semester/grade combination (8 options: Grade 1–4 × 2 semesters) and can add, edit, or delete schedule entries with fields for course, day, type, time, location, and doctor name.
+  </p>
+
+  <h3>6.6 Exam Management</h3>
+  <p>
+    Doctors and admins can add upcoming exams with fields for exam type (Midterm/Final/Quiz), date, time, location, and notes. Exams are displayed by semester and automatically appear in student home dashboard countdown timers.
+  </p>
+
+  <h3>6.7 Notifications (Admin Only)</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Broadcast Notifications</h4>
+      <p>Admins send announcements to all students with category selection: Day Off, Lecture Cancelled, Event, Holiday, Exam, General.</p>
+      <p class="why">Why: Centralized announcements replace scattered WhatsApp groups and ensure all students receive important updates.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Notification Management</h4>
+      <p>View all sent notifications with timestamps and categories. Delete outdated or incorrect notifications.</p>
+      <p class="why">Why: Admins need to manage the notification history and correct mistakes.</p>
+    </div>
+  </div>
+
+  <h3>6.8 Admin Feedback (Admin Only)</h3>
+  <p>
+    Admins can send private feedback to doctors about specific students (e.g., medical exemptions, academic accommodations). These appear as blue-styled cards visible only to doctors and admins — never to students. Supports urgent flagging for time-sensitive matters.
   </p>
 </div>
 
@@ -807,7 +896,7 @@
 
   <h3>Prerequisites</h3>
   <ul>
-    <li>Node.js v22+ (required for experimental <code>node:sqlite</code> module)</li>
+    <li>Node.js v18+ and npm</li>
   </ul>
 
   <h3>Web Application Setup</h3>
@@ -832,7 +921,7 @@ npm start
     <tbody>
       <tr><td>Student</td><td><code>30012151012341</code></td><td><code>123456</code></td></tr>
       <tr><td>Doctor</td><td><code>29803050202394</code></td><td><code>123456</code></td></tr>
-      <tr><td>Admin</td><td><code>29803050202395</code></td><td><code>123456</code></td></tr>
+      <tr><td>Admin</td><td><code>admin001</code></td><td><code>123456</code></td></tr>
     </tbody>
   </table>
 
@@ -848,26 +937,139 @@ npm start
       <tr><td><code>npm run db:seed:students</code></td><td>Seed 20 students with grades/attendance</td></tr>
       <tr><td><code>npm run db:seed:schedule</code></td><td>Seed class schedules</td></tr>
       <tr><td><code>npm run db:seed:staff</code></td><td>Seed course staff assignments</td></tr>
+      <tr><td><code>npm run db:seed:notifications</code></td><td>Seed sample notifications</td></tr>
+      <tr><td><code>npm run db:seed:materials</code></td><td>Seed course materials (~55 resources)</td></tr>
     </tbody>
   </table>
 </div>
 
-<!-- ═══════════════════════════════════════ 15. FUTURE ═══════════ -->
+<!-- ═══════════════════════════════════════ 15. CHATBOT ═══════════ -->
 <div class="section">
-  <h2>15. Future Enhancements</h2>
+  <h2>15. AI Chatbot — UniBot</h2>
+
+  <p>
+    UniBot is a <strong>rule-based, offline chatbot</strong> that provides instant academic assistance without requiring any external API. It runs entirely on pattern matching and weighted keyword scoring, making it fast, reliable, and free of API quota limits.
+  </p>
+
+  <h3>Architecture</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Pattern Matching Engine</h4>
+      <p>Regex-based intent detection with weighted keyword scoring across 16 intents. Each message is scored against all intents and the highest-scoring match is selected.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Bilingual Support</h4>
+      <p>Automatic language detection (English/Arabic). Responses are generated in the same language as the student's input.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Context-Aware Responses</h4>
+      <p>Fetches real student data from the database (GPA, grades, attendance, schedule) for personalized, accurate responses.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Follow-Up Suggestions</h4>
+      <p>Each response includes clickable suggestion buttons for guided conversation flow, reducing the need to type.</p>
+    </div>
+  </div>
+
+  <h3>Supported Intents (16)</h3>
+  <table>
+    <thead><tr><th>Intent</th><th>Example Queries</th><th>Response</th></tr></thead>
+    <tbody>
+      <tr><td><code>greeting</code></td><td>"Hello", "مرحبا"</td><td>Welcome message with capabilities list</td></tr>
+      <tr><td><code>gpa</code></td><td>"What is my GPA?", "كم معدلي؟"</td><td>Current GPA, trend arrow, semester history</td></tr>
+      <tr><td><code>grades</code></td><td>"Show my grades", "عرض درجاتي"</td><td>All course grades with danger flags</td></tr>
+      <tr><td><code>attendance</code></td><td>"How is my attendance?"</td><td>Overall + per-course attendance</td></tr>
+      <tr><td><code>schedule</code></td><td>"What's my schedule today?"</td><td>Today's classes or full weekly schedule</td></tr>
+      <tr><td><code>next_class</code></td><td>"When is my next class?"</td><td>Finds the next upcoming class</td></tr>
+      <tr><td><code>feedback</code></td><td>"Any feedback from doctors?"</td><td>Doctor feedback messages</td></tr>
+      <tr><td><code>notifications</code></td><td>"Any new notifications?"</td><td>Recent announcements</td></tr>
+      <tr><td><code>profile</code></td><td>"Show my profile"</td><td>Personal information summary</td></tr>
+      <tr><td><code>danger</code></td><td>"Any warnings or risks?"</td><td>At-risk courses, low GPA, attendance warnings</td></tr>
+      <tr><td><code>best_course</code></td><td>"What's my best course?"</td><td>Highest-scoring course</td></tr>
+      <tr><td><code>worst_course</code></td><td>"What's my worst course?"</td><td>Lowest-scoring course + improvement target</td></tr>
+      <tr><td><code>tips</code></td><td>"Give me study tips"</td><td>Personalized advice based on weak areas</td></tr>
+      <tr><td><code>university</code></td><td>"Tell me about the university"</td><td>EELU info: grading scale, probation, LMS</td></tr>
+      <tr><td><code>thanks</code></td><td>"Thank you", "شكرا"</td><td>Random appreciation response</td></tr>
+      <tr><td><code>bye</code></td><td>"Goodbye", "مع السلامة"</td><td>Farewell message</td></tr>
+    </tbody>
+  </table>
+
+  <h3>UI Features</h3>
+  <ul>
+    <li><strong>Floating Action Button (FAB)</strong> — Gold/purple gradient bubble in bottom-right with pulse animation</li>
+    <li><strong>Slide-Up Chat Panel</strong> — Header, scrollable message area, and input field</li>
+    <li><strong>Typing Indicator</strong> — Animated bouncing dots with 1.2–3 second simulated delay</li>
+    <li><strong>Markdown Rendering</strong> — Bot responses support bold, lists, and code formatting</li>
+    <li><strong>Clear Chat</strong> — Reset conversation with one click</li>
+    <li><strong>Mobile Fullscreen</strong> — Chat panel goes fullscreen on mobile (&lt;480px) using <code>100dvh</code></li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════ 16. PWA ══════════════ -->
+<div class="section">
+  <h2>16. Progressive Web App (PWA)</h2>
+
+  <p>UniVision is installable as a Progressive Web App on supported devices, providing an app-like experience.</p>
 
   <div class="feature-grid">
     <div class="feature-card">
-      <h4>Push Notifications</h4>
-      <p>Firebase Cloud Messaging for real-time grade updates and alert notifications on mobile.</p>
+      <h4>Web App Manifest</h4>
+      <p>Standalone display mode with no browser chrome. Theme color: <code>#d4a830</code> (gold), background: <code>#0a0e1a</code> (dark navy). Icons at 192×192 and 512×512.</p>
     </div>
     <div class="feature-card">
-      <h4>Offline Mode</h4>
-      <p>Cache last-fetched data locally so students can view grades/schedule without internet.</p>
+      <h4>Service Worker</h4>
+      <p>Network-first strategy with cache fallback. Caches HTML, CSS, JS, logo, and Font Awesome. API requests are excluded (always network). Offline navigation falls back to cached home page.</p>
     </div>
     <div class="feature-card">
-      <h4>Chat System</h4>
-      <p>Real-time messaging between students and doctors using WebSockets.</p>
+      <h4>Auto Registration</h4>
+      <p>Service Worker registered via <code>theme.js</code> on every page. Manifest link and Apple meta tags injected dynamically.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Installation</h4>
+      <p><strong>Android/Chrome:</strong> Install prompt or browser menu. <strong>iOS/Safari:</strong> "Add to Home Screen" from the share menu (Chrome on iOS does not support PWA).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 17. NOTIFICATIONS ════ -->
+<div class="section">
+  <h2>17. Notification System</h2>
+
+  <p>A complete broadcast notification system connecting admins to students.</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Categories</h4>
+      <p>6 notification types: Day Off, Lecture Cancelled, Event, Holiday, Exam, General — each with a unique icon and color.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Date Grouping</h4>
+      <p>Notifications organized by Today, Yesterday, This Week, and Older for easy scanning.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Read Tracking</h4>
+      <p>Per-student read status tracked via <code>notification_reads</code> table. Click to mark read, or "Mark All Read" for one-click clearing.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Live Badge</h4>
+      <p>Unread count badge on the notification bell icon in the navbar, updated in real-time on every page load.</p>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h4>Mobile Responsive</h4>
+    <p>On mobile, the notification dropdown uses <code>position: fixed</code> to fill the viewport width, preventing overflow and ensuring readability on small screens.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 18. FUTURE ═══════════ -->
+<div class="section">
+  <h2>18. Future Enhancements</h2>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>Real-Time Messaging</h4>
+      <p>WebSocket-based real-time chat between students and doctors for direct communication.</p>
     </div>
     <div class="feature-card">
       <h4>Assignment Tracking</h4>
@@ -880,6 +1082,14 @@ npm start
     <div class="feature-card">
       <h4>Multi-Language Support</h4>
       <p>Full Arabic localization with RTL layout support for the entire portal.</p>
+    </div>
+    <div class="feature-card">
+      <h4>Push Notifications</h4>
+      <p>Firebase Cloud Messaging for real-time push alerts on mobile devices when new grades or notifications are posted.</p>
+    </div>
+    <div class="feature-card">
+      <h4>AI-Powered Chatbot</h4>
+      <p>Upgrade UniBot from rule-based to LLM-powered (e.g., Gemini/GPT) for natural language understanding and open-ended academic advising.</p>
     </div>
   </div>
 
