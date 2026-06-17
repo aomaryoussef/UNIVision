@@ -320,6 +320,7 @@
             </div>
           </div>
           ${sem.courses && sem.courses.length ? `
+          <div class="table-scroll">
           <table>
             <thead>
               <tr><th>#</th><th>Course</th><th>Credits</th><th>Score</th><th>Grade</th><th>Points</th><th>Progress</th></tr>
@@ -343,7 +344,8 @@
                 </tr>
               `).join("")}
             </tbody>
-          </table>` : `<div class="empty">No course data for this semester.</div>`}
+          </table>
+          </div>` : `<div class="empty">No course data for this semester.</div>`}
         `;
       } catch (err) {
         panel.innerHTML = `<div class="empty">Failed to load semester details.</div>`;

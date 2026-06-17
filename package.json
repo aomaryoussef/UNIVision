@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "docx": "^9.7.1",
     "puppeteer": "^24.43.1"
   }
 }

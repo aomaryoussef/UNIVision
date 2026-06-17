@@ -116,9 +116,10 @@ input, select { font-family: inherit; }
   color: var(--text-secondary);
   cursor: pointer;
   padding: 6px;
+  flex-shrink: 0;
 }
 @media (max-width: 768px) {
-  .navbar { padding: 0 16px; }
+  .navbar { padding: 0 16px; gap: 8px; }
   .nav-toggle { display: block; }
   .nav-menu {
     display: none;
@@ -138,7 +139,13 @@ input, select { font-family: inherit; }
   .nav-user { display: none; }
   .page-wrapper { padding-left: 16px; padding-right: 16px; }
   #logoutBtn span { display: none; }
-  #logoutBtn { padding: 8px 10px !important; }
+  #logoutBtn { padding: 8px 10px !important; flex-shrink: 0; }
+}
+@media (max-width: 380px) {
+  .navbar { padding: 0 10px; gap: 4px; }
+  .logo { font-size: 1.1rem; }
+  .logo-icon { width: 30px; height: 30px; font-size: 0.85rem; }
+  #logoutBtn { padding: 6px 8px !important; }
 }
 
 /* ── Responsive tables ──────────────────────────────── */
