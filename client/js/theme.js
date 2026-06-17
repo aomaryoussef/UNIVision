@@ -210,6 +210,7 @@
       .theme-switcher {
         position: relative;
         margin-right: 8px;
+        flex-shrink: 0;
       }
       .theme-toggle {
         display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -222,6 +223,11 @@
       .theme-toggle:hover {
         background: rgba(var(--accent-rgb),.18);
         border-color: var(--accent);
+      }
+      @media (max-width: 1536px) {
+        .theme-toggle span { display: none; }
+        .theme-toggle { padding: 8px 10px; gap: 0; }
+        .theme-switcher { margin-right: 4px; }
       }
       .theme-dropdown {
         position: absolute; top: calc(100% + 8px); right: 0;
