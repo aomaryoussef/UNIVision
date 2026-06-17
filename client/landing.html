@@ -337,11 +337,6 @@
   <!-- ── Nav ──────────────────────────────────────────────── -->
   <nav>
     <div class="logo-mark"><img src="/assets/logo.png" alt="UniVision" style="height:44px;width:auto;"></div>
-    <ul class="nav-links">
-      <li><a href="#features">Features</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
     <a href="/login" class="nav-cta">Sign In</a>
   </nav>
 
@@ -447,11 +442,11 @@
   </section>
 
   <!-- ── Footer ───────────────────────────────────────────── -->
-  <footer id="contact">
+  <footer>
     <ul class="f-links">
-      <li><a href="#">Privacy Policy</a></li>
-      <li><a href="#">Terms of Service</a></li>
-      <li><a href="#">Support</a></li>
+      <li><a href="#" onclick="openModal('privacy');return false;">Privacy Policy</a></li>
+      <li><a href="#" onclick="openModal('terms');return false;">Terms of Service</a></li>
+      <li><a href="#" onclick="openModal('support');return false;">Support</a></li>
     </ul>
     <div class="social-links">
       <a class="social-btn fb" href="https://www.facebook.com/share/1Hu8kg7tb1/?mibextid=wwXIfr" target="_blank" rel="noopener" title="Facebook">
@@ -463,6 +458,191 @@
     </div>
     <div class="f-copy">© 2026 UNIVision. All rights reserved.</div>
   </footer>
+
+  <!-- ── Legal / Support Modals ──────────────────────────── -->
+  <style>
+    .lm-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9000;
+      background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .lm-overlay.open { display: flex; }
+    .lm-box {
+      background: #0f1f3d; border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px; width: 100%; max-width: 640px;
+      max-height: 82vh; display: flex; flex-direction: column;
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+      animation: lmIn .25s ease;
+    }
+    @keyframes lmIn {
+      from { opacity:0; transform:translateY(20px) scale(.97); }
+      to   { opacity:1; transform:translateY(0)    scale(1);   }
+    }
+    .lm-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 16px; border-bottom: 1px solid rgba(255,255,255,.08);
+      flex-shrink: 0;
+    }
+    .lm-head h2 { font-size: 1.05rem; font-weight: 800; color: #f0f0f0; display:flex; align-items:center; gap:10px; }
+    .lm-head h2 i { color: #C9A84C; font-size: .95rem; }
+    .lm-close {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      color: #a0b4c0; font-size: .95rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .lm-close:hover { background: rgba(255,255,255,.12); color: #f0f0f0; }
+    .lm-body {
+      padding: 22px 24px 24px; overflow-y: auto; flex: 1;
+      font-size: .88rem; color: #b0c4d8; line-height: 1.8;
+    }
+    .lm-body h3 { font-size: .82rem; font-weight: 700; color: #C9A84C; text-transform: uppercase; letter-spacing: .6px; margin: 20px 0 8px; }
+    .lm-body h3:first-child { margin-top: 0; }
+    .lm-body p { margin-bottom: 10px; }
+    .lm-body ul { margin: 6px 0 10px 18px; }
+    .lm-body ul li { margin-bottom: 5px; }
+    .lm-body a { color: #C9A84C; text-decoration: underline; }
+    .lm-tag {
+      font-size: .72rem; color: rgba(255,255,255,.3);
+      padding: 12px 24px; border-top: 1px solid rgba(255,255,255,.06);
+      flex-shrink: 0;
+    }
+  </style>
+
+  <div class="lm-overlay" id="modal-privacy">
+    <div class="lm-box">
+      <div class="lm-head">
+        <h2><i class="fas fa-shield-alt"></i> Privacy Policy</h2>
+        <button class="lm-close" onclick="closeModal('privacy')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="lm-body">
+        <h3>1. Information We Collect</h3>
+        <p>UniVision collects only the data necessary to provide academic services to students, faculty, and administrators of the Egyptian E-Learning University (EELU). This includes:</p>
+        <ul>
+          <li>University-issued student ID and login credentials</li>
+          <li>Academic records: grades, attendance, and course information</li>
+          <li>Profile data provided at registration (name, national ID, contact details)</li>
+          <li>Usage logs for audit and security purposes</li>
+        </ul>
+
+        <h3>2. How We Use Your Data</h3>
+        <p>All collected data is used exclusively for academic reporting, portal functionality, and improving the student experience. We do not sell, rent, or share personal information with third parties outside the university.</p>
+
+        <h3>3. Data Storage & Security</h3>
+        <p>Your data is stored on secured university servers. Access is restricted by role-based authentication (JWT tokens). Passwords are hashed using industry-standard bcrypt encryption and are never stored in plain text.</p>
+
+        <h3>4. Cookies & Sessions</h3>
+        <p>UniVision uses session cookies solely to maintain your authenticated login state. No tracking or advertising cookies are used.</p>
+
+        <h3>5. Your Rights</h3>
+        <p>You have the right to request access to your personal data or ask for corrections. Contact your university administrator or reach out via the Support page.</p>
+
+        <h3>6. Changes to This Policy</h3>
+        <p>We may update this policy periodically. Continued use of UniVision after changes constitutes acceptance of the updated policy. Last updated: June 2026.</p>
+      </div>
+      <div class="lm-tag">Egyptian E-Learning University — UniVision Academic Portal</div>
+    </div>
+  </div>
+
+  <div class="lm-overlay" id="modal-terms">
+    <div class="lm-box">
+      <div class="lm-head">
+        <h2><i class="fas fa-file-contract"></i> Terms of Service</h2>
+        <button class="lm-close" onclick="closeModal('terms')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="lm-body">
+        <h3>1. Acceptance</h3>
+        <p>By accessing or using UniVision, you agree to be bound by these Terms of Service and all applicable university regulations. If you do not agree, please discontinue use immediately.</p>
+
+        <h3>2. Eligibility</h3>
+        <p>UniVision is available exclusively to enrolled students, registered faculty (doctors), and authorized administrators of the Egyptian E-Learning University. Access credentials are non-transferable.</p>
+
+        <h3>3. Acceptable Use</h3>
+        <p>You agree not to:</p>
+        <ul>
+          <li>Share your login credentials with any other person</li>
+          <li>Attempt to access accounts or data that do not belong to you</li>
+          <li>Use the platform for any purpose unrelated to your academic role</li>
+          <li>Reverse-engineer, scrape, or tamper with portal systems</li>
+        </ul>
+
+        <h3>4. Academic Integrity</h3>
+        <p>All grades, attendance records, and academic data displayed on UniVision reflect official university records. Any disputes must be submitted through official academic channels.</p>
+
+        <h3>5. Service Availability</h3>
+        <p>UniVision is provided "as is." The university reserves the right to suspend or modify the portal at any time for maintenance, updates, or security purposes without prior notice.</p>
+
+        <h3>6. Intellectual Property</h3>
+        <p>All design, code, and content on this platform are the property of the Egyptian E-Learning University and the UniVision development team. Unauthorised reproduction is prohibited.</p>
+
+        <h3>7. Termination</h3>
+        <p>Access may be revoked at any time for violations of these terms or upon leaving the university. Graduating students retain read-only access to their records for one academic year.</p>
+
+        <h3>8. Governing Law</h3>
+        <p>These terms are governed by the laws of the Arab Republic of Egypt.</p>
+      </div>
+      <div class="lm-tag">Egyptian E-Learning University — UniVision Academic Portal</div>
+    </div>
+  </div>
+
+  <div class="lm-overlay" id="modal-support">
+    <div class="lm-box">
+      <div class="lm-head">
+        <h2><i class="fas fa-headset"></i> Support</h2>
+        <button class="lm-close" onclick="closeModal('support')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="lm-body">
+        <h3>Getting Help</h3>
+        <p>UniVision is maintained by the Egyptian E-Learning University's IT team. For issues related to your account or academic data, please use one of the channels below.</p>
+
+        <h3>Student Services</h3>
+        <ul>
+          <li><strong>Official Support Portal:</strong> <a href="https://www.eelu.edu.eg/Student-Services-Unit" target="_blank" rel="noopener">eelu.edu.eg/Student-Services-Unit</a></li>
+          <li><strong>University Main Website:</strong> <a href="https://eelu.edu.eg" target="_blank" rel="noopener">eelu.edu.eg</a></li>
+          <li><strong>E-Learning Platform:</strong> <a href="https://sis.eelu.edu.eg/static/index.html" target="_blank" rel="noopener">sis.eelu.edu.eg</a></li>
+        </ul>
+
+        <h3>Common Issues</h3>
+        <ul>
+          <li><strong>Forgot password?</strong> Contact your department coordinator or university IT support to reset your credentials.</li>
+          <li><strong>Incorrect grades or attendance?</strong> Speak to your course doctor directly, or submit a formal correction request through the student services unit.</li>
+          <li><strong>Can't log in?</strong> Ensure you're using your university-issued student ID and the correct password. Clear your browser cache and try again.</li>
+          <li><strong>Missing course data?</strong> Data is updated by your doctor. Allow up to 48 hours after an update is submitted.</li>
+        </ul>
+
+        <h3>Social Media</h3>
+        <p>Follow UniVision for updates and announcements:</p>
+        <ul>
+          <li><a href="https://www.facebook.com/share/1Hu8kg7tb1/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook Page</a></li>
+          <li><a href="https://www.instagram.com/uni.vision.1?igsh=MWE2YXpuNmdrbHNsZQ==" target="_blank" rel="noopener">Instagram</a></li>
+        </ul>
+      </div>
+      <div class="lm-tag">Egyptian E-Learning University — UniVision Academic Portal</div>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) {
+      document.getElementById('modal-' + id).classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+      document.getElementById('modal-' + id).classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.lm-overlay').forEach(el => {
+      el.addEventListener('click', function(e) {
+        if (e.target === el) closeModal(el.id.replace('modal-', ''));
+      });
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.lm-overlay.open').forEach(el => {
+          closeModal(el.id.replace('modal-', ''));
+        });
+      }
+    });
+  </script>
 
   <script type="module">
     import { Auth } from "/js/student-api.js";
